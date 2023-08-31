@@ -24,21 +24,15 @@ export default function Login() {
   const loginFetcher = useFetcher({
     api: signIn,
     onSuccess: (data) => {
-      setCookies(
-        "token",
-        {
-          token: data.token,
-        },
-        {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 365,
-        }
-      );
+      setCookies("token", data.token, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+      });
     },
   });
 
   return (
-    <div className="w-full min-h-screen bg-gray-200 flex flex-col items-center justify-center p-5">
+    <div className="w-full min-h-screen bg-gray-200 flex flex-col items-center justify-start lg:justify-center p-5">
       <div className="w-2/3 lg:w-[360px] bg-white py-8 rounded mb-5 text-center">
         Logo
       </div>
