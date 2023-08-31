@@ -3,5 +3,8 @@
   "email": "Email",
   "password": "Password",
   "forgotPassword": "Lupa password?",
-  "signIn": "Masuk"
+  "signIn": "Masuk",
+  "waitAMinute": "Tunggu sebentar...",
+  "succeed": "Berhasil",
+  "failed": "Gagal"
 }
