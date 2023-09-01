@@ -123,7 +123,7 @@ export default function Layout() {
             className="relative flex items-center justify-end space-x-5 p-3 px-5 rounded"
           >
             <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
-              {user?.avatar ? (
+              {user?.avatar && typeof user.avatar === "string" ? (
                 <img src={user.avatar} className="w-full h-full object-cover" />
               ) : (
                 <RiUser6Fill className="text-xl lg:text-2xl text-primary-500" />

@@ -27,5 +27,8 @@
   "search": "Cari",
   "sort": "Urut",
   "filter": "Saring",
-  "new": "Baru"
+  "new": "Baru",
+  "addUser": "Tambah Pengguna",
+  "add": "Tambah",
+  "requiredMsg": "Tidak boleh kosong"
 }

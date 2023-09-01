@@ -1,12 +1,11 @@
 import { HTMLProps, ReactNode } from "react";
 import {
-  RiSearch2Line,
   RiArrowUpDownLine,
   RiFilter2Line,
-  RiAddBoxLine,
+  RiSearch2Line,
 } from "react-icons/ri";
-import Button from "../Button";
 import getLang from "../../languages";
+import Button from "../Button";
 
 export type TableData<T, K extends keyof T = keyof T> = {
   key: K | null;
@@ -20,9 +19,15 @@ export type TableProps<T> = {
   data: T[];
   columns: (TableData<T> | "indexing")[];
   loading?: boolean;
+  buttons?: ReactNode;
 };
 
-export default function Table<T>({ data, columns, loading }: TableProps<T>) {
+export default function Table<T>({
+  data,
+  columns,
+  loading,
+  buttons,
+}: TableProps<T>) {
   return (
     <div className="flex-1 flex flex-col relative">
       {loading && (
@@ -62,15 +67,7 @@ export default function Table<T>({ data, columns, loading }: TableProps<T>) {
             <RiFilter2Line className="text-base lg:text-sm m-0 lg:mr-2" />
             <span className="hidden lg:block">{getLang().filter}</span>
           </Button>
-          <Button
-            element={"button"}
-            type="button"
-            color="green"
-            className="flex items-center"
-          >
-            <RiAddBoxLine className="text-base lg:text-sm m-0 lg:mr-2" />
-            <span className="hidden lg:block">{getLang().new}</span>
-          </Button>
+          {buttons}
         </div>
       </div>
       <div className="overflow-x-auto relative flex-1">
