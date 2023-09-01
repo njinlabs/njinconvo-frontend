@@ -106,10 +106,10 @@ export default function Layout() {
             <NavbarList to="/" active={web.active === "Dashboard"}>
               {getLang().dashboard}
             </NavbarList>
-            <NavbarList to="/user" active={web.active === "User"}>
+            <NavbarList to="/" active={web.active === ""}>
               {getLang().classroom}
             </NavbarList>
-            <NavbarList to="/" active={web.active === ""}>
+            <NavbarList to="/user" active={web.active === "User"}>
               {getLang().user}
             </NavbarList>
             <NavbarList to="/" active={web.active === ""}>
