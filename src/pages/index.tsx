@@ -4,7 +4,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { CgChevronDown } from "react-icons/cg";
 import { DropdownItem, DropdownMenu } from "../components/dropdown";
 import { DropdownMenuRefObject } from "../components/dropdown/DropdownMenu";
-import { RiLogoutCircleLine } from "react-icons/ri";
+import { RiLogoutCircleLine, RiUser6Fill } from "react-icons/ri";
 import { useFetcher } from "../utilities/fetcher";
 import signOut from "../apis/auth/sign/sign-out";
 import getLang from "../languages";
@@ -12,6 +12,8 @@ import { toast } from "react-toastify";
 import client from "../apis/client";
 import checkToken from "../apis/auth/check-token";
 import NavbarList from "../components/NavbarList";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { clearUser, setUser } from "../redux/slices/user";
 
 export default function Layout() {
   const cookie = useCookies(["token"]);
@@ -20,10 +22,13 @@ export default function Layout() {
   const [mount, setMount] = useState(false);
   const navigate = useNavigate();
   const _dropdown = useRef<DropdownMenuRefObject>();
+  const dispatch = useAppDispatch();
+  const { data: user } = useAppSelector((state) => state.user);
 
   const logoutFetcher = useFetcher({
     api: signOut,
     onSuccess: () => {
+      dispatch(clearUser());
       removeCookies("token", {
         path: "/",
       });
@@ -32,7 +37,8 @@ export default function Layout() {
 
   const checkTokenFetcher = useFetcher({
     api: checkToken,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      dispatch(setUser(data));
       setMount(true);
     },
     onFail: (e) => {
@@ -79,12 +85,20 @@ export default function Layout() {
           onBlur={(e) => _dropdown.current?.onBlur(e)}
           className="relative flex items-center justify-end space-x-3 w-auto lg:w-72 p-3 px-5 rounded"
         >
-          <div className="w-12 h-12 rounded-full bg-white" />
+          <div className="w-12 h-12 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
+            {user?.avatar ? (
+              <img src={user.avatar} className="w-full h-full object-cover" />
+            ) : (
+              <RiUser6Fill className="text-2xl text-primary-500" />
+            )}
+          </div>
           <div className="flex-1">
             <div className="font-bold font-nunito-sans line-clamp-1">
-              Akbar Aditama Supriyono Putra
+              {user?.fullname}
             </div>
-            <div className="text-sm">{getLang().administrator}</div>
+            <div className="text-sm">
+              {getLang()[user?.role as keyof ReturnType<typeof getLang>]}
+            </div>
           </div>
           <div>
             <CgChevronDown />
