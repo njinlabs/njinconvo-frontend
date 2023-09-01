@@ -33,13 +33,13 @@ export default function Table<T>({ data, columns, loading }: TableProps<T>) {
         </div>
       )}
       <div className="border-b border-gray-400 flex justify-start items-center">
-        <div className="border-r border-gray-400 flex-1 lg:flex-0 w-auto lg:w-1/3 relative">
+        <div className="border-r border-gray-300 flex-1 lg:flex-0 w-auto lg:w-1/3 relative">
           <input
             type="text"
-            className="w-full h-16 px-3 pl-10"
+            className="w-full h-16 px-3 pl-10 lg:pl-12"
             placeholder={getLang().search + "..."}
           />
-          <div className="absolute top-0 left-0 h-16 w-10 flex justify-center items-center pointer-events-none">
+          <div className="absolute top-0 left-0 h-16 w-10 lg:w-12 flex justify-center items-center pointer-events-none">
             <RiSearch2Line />
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function Table<T>({ data, columns, loading }: TableProps<T>) {
             <tr>
               {columns.map((item, index) => (
                 <th
-                  className="py-4 px-5 text-left shadow-sm shadow-gray-200 border-b border-gray-400"
+                  className="py-4 px-5 text-left shadow-sm shadow-gray-200 border-b border-gray-400 whitespace-nowrap"
                   key={`${index}`}
                   {...(item !== "indexing" && item.props ? item.props : {})}
                 >

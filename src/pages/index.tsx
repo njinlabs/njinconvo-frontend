@@ -4,7 +4,12 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { CgChevronDown } from "react-icons/cg";
 import { DropdownItem, DropdownMenu } from "../components/dropdown";
 import { DropdownMenuRefObject } from "../components/dropdown/DropdownMenu";
-import { RiLogoutCircleLine, RiUser6Fill } from "react-icons/ri";
+import {
+  RiLogoutCircleLine,
+  RiUser6Fill,
+  RiMenu2Fill,
+  RiCloseFill,
+} from "react-icons/ri";
 import { useFetcher } from "../utilities/fetcher";
 import signOut from "../apis/auth/sign/sign-out";
 import getLang from "../languages";
@@ -14,6 +19,7 @@ import checkToken from "../apis/auth/check-token";
 import NavbarList from "../components/NavbarList";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { clearUser, setUser } from "../redux/slices/user";
+import { useLocation } from "react-router-dom";
 
 export default function Layout() {
   const cookie = useCookies(["token"]);
@@ -25,6 +31,8 @@ export default function Layout() {
   const dispatch = useAppDispatch();
   const web = useAppSelector((state) => state.web);
   const { data: user } = useAppSelector((state) => state.user);
+  const { pathname } = useLocation();
+  const [menuShown, setMenuShown] = useState(false);
 
   const logoutFetcher = useFetcher({
     api: signOut,
@@ -55,8 +63,11 @@ export default function Layout() {
 
   useEffect(() => {
     if (!cookies.token) {
-      navigate("/auth", {
+      navigate("/auth/login", {
         replace: true,
+        state: {
+          next: pathname,
+        },
       });
     } else {
       client.defaults.headers.common[
@@ -69,40 +80,56 @@ export default function Layout() {
   if (!mount) return null;
 
   return (
-    <div className="w-full min-h-screen bg-gray-200 flex flex-col justify-start space-y-3 px-8 pb-5">
-      <div className="h-20 flex justify-between items-center">
-        <div className="flex-1">
-          <div className="h-16 w-72 bg-white rounded flex justify-center items-center">
+    <div className="w-full min-h-screen bg-gray-200 flex flex-col justify-start space-y-3 px-5 lg:px-8 pb-3 overflow-x-hidden">
+      <div className="h-20 flex justify-between items-center relative z-10">
+        <div className="flex-1 flex justify-start items-center transform -translate-x-3 lg:translate-x-0">
+          <button
+            type="button"
+            onClick={() => setMenuShown((value) => !value)}
+            className="mr-1 h-12 px-3 block lg:hidden text-gray-800"
+          >
+            <RiMenu2Fill className={menuShown ? "hidden" : "block"} />
+            <RiCloseFill className={menuShown ? "block" : "hidden"} />
+          </button>
+          <div className="h-16 w-1/2 lg:w-72 bg-white rounded flex justify-center items-center">
             Logo
           </div>
         </div>
-        <div className="w-1/2 flex justify-center space-x-1">
-          <NavbarList to="/" active={web.active === "Dashboard"}>
-            {getLang().dashboard}
-          </NavbarList>
-          <NavbarList to="/user" active={web.active === "User"}>
-            {getLang().classroom}
-          </NavbarList>
-          <NavbarList to="/" active={web.active === ""}>
-            {getLang().user}
-          </NavbarList>
-          <NavbarList to="/" active={web.active === ""}>
-            {getLang().setting}
-          </NavbarList>
+        <div
+          className={`w-full lg:w-1/2 fixed lg:static top-0 mt-20 lg:mt-0 left-0 h-screen lg:h-auto p-5 pt-3 lg:p-0 transform ${
+            menuShown
+              ? "translate-y-0 opacity-100"
+              : "-translate-y-[120%] opacity-0"
+          } lg:translate-y-0 lg:opacity-100 transition duration-1000`}
+        >
+          <div className="w-full flex flex-col lg:flex-row justify-start lg:justify-center space-y-1 lg:space-y-0 space-x-0 lg:space-x-1 bg-white lg:bg-transparent rounded py-5 px-2 lg:p-0 shadow-md shadow-gray-200 lg:shadow-none">
+            <NavbarList to="/" active={web.active === "Dashboard"}>
+              {getLang().dashboard}
+            </NavbarList>
+            <NavbarList to="/user" active={web.active === "User"}>
+              {getLang().classroom}
+            </NavbarList>
+            <NavbarList to="/" active={web.active === ""}>
+              {getLang().user}
+            </NavbarList>
+            <NavbarList to="/" active={web.active === ""}>
+              {getLang().setting}
+            </NavbarList>
+          </div>
         </div>
-        <div className="flex-1">
+        <div className="flex-0 lg:flex-1 flex justify-end transform translate-x-5">
           <div
             onBlur={(e) => _dropdown.current?.onBlur(e)}
-            className="relative flex items-center justify-end space-x-3 p-3 px-5 rounded"
+            className="relative flex items-center justify-end space-x-5 p-3 px-5 rounded"
           >
-            <div className="w-12 h-12 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
               {user?.avatar ? (
                 <img src={user.avatar} className="w-full h-full object-cover" />
               ) : (
-                <RiUser6Fill className="text-2xl text-primary-500" />
+                <RiUser6Fill className="text-xl lg:text-2xl text-primary-500" />
               )}
             </div>
-            <div>
+            <div className="hidden lg:block">
               <div className="font-bold font-nunito-sans line-clamp-1">
                 {user?.fullname}
               </div>
