@@ -15,5 +15,17 @@
   "setting": "Pengaturan",
   "administrator": "Administrator",
   "teacher": "Pengajar",
-  "student": "Pelajar"
+  "student": "Pelajar",
+  "photo": "Foto",
+  "fullname": "Nama Lengkap",
+  "gender": "Jenis Kelamin",
+  "role": "Peran",
+  "birthday": "Tanggal Lahir",
+  "action": "Aksi",
+  "male": "Laki-laki",
+  "female": "Perempuan",
+  "search": "Cari",
+  "sort": "Urut",
+  "filter": "Saring",
+  "new": "Baru"
 }

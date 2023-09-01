@@ -23,6 +23,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const _dropdown = useRef<DropdownMenuRefObject>();
   const dispatch = useAppDispatch();
+  const web = useAppSelector((state) => state.web);
   const { data: user } = useAppSelector((state) => state.user);
 
   const logoutFetcher = useFetcher({
@@ -68,64 +69,74 @@ export default function Layout() {
   if (!mount) return null;
 
   return (
-    <div className="w-full min-h-screen bg-gray-200 flex flex-col justify-start px-8 pb-8">
+    <div className="w-full min-h-screen bg-gray-200 flex flex-col justify-start space-y-3 px-8 pb-5">
       <div className="h-20 flex justify-between items-center">
-        <div className="h-16 w-auto lg:w-72 bg-white rounded flex justify-center items-center">
-          Logo
+        <div className="flex-1">
+          <div className="h-16 w-72 bg-white rounded flex justify-center items-center">
+            Logo
+          </div>
         </div>
         <div className="w-1/2 flex justify-center space-x-1">
-          <NavbarList to="/" active>
+          <NavbarList to="/" active={web.active === "Dashboard"}>
             {getLang().dashboard}
           </NavbarList>
-          <NavbarList to="/">{getLang().classroom}</NavbarList>
-          <NavbarList to="/">{getLang().user}</NavbarList>
-          <NavbarList to="/">{getLang().setting}</NavbarList>
+          <NavbarList to="/user" active={web.active === "User"}>
+            {getLang().classroom}
+          </NavbarList>
+          <NavbarList to="/" active={web.active === ""}>
+            {getLang().user}
+          </NavbarList>
+          <NavbarList to="/" active={web.active === ""}>
+            {getLang().setting}
+          </NavbarList>
         </div>
-        <div
-          onBlur={(e) => _dropdown.current?.onBlur(e)}
-          className="relative flex items-center justify-end space-x-3 w-auto lg:w-72 p-3 px-5 rounded"
-        >
-          <div className="w-12 h-12 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
-            {user?.avatar ? (
-              <img src={user.avatar} className="w-full h-full object-cover" />
-            ) : (
-              <RiUser6Fill className="text-2xl text-primary-500" />
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="font-bold font-nunito-sans line-clamp-1">
-              {user?.fullname}
+        <div className="flex-1">
+          <div
+            onBlur={(e) => _dropdown.current?.onBlur(e)}
+            className="relative flex items-center justify-end space-x-3 p-3 px-5 rounded"
+          >
+            <div className="w-12 h-12 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
+              {user?.avatar ? (
+                <img src={user.avatar} className="w-full h-full object-cover" />
+              ) : (
+                <RiUser6Fill className="text-2xl text-primary-500" />
+              )}
             </div>
-            <div className="text-sm">
-              {getLang()[user?.role as keyof ReturnType<typeof getLang>]}
+            <div>
+              <div className="font-bold font-nunito-sans line-clamp-1">
+                {user?.fullname}
+              </div>
+              <div className="text-sm">
+                {getLang()[user?.role as keyof ReturnType<typeof getLang>]}
+              </div>
             </div>
+            <div>
+              <CgChevronDown />
+            </div>
+            <button
+              type="button"
+              className="absolute top-0 left-0 w-full h-full rounded"
+              onClick={() => _dropdown.current?.toggle()}
+            ></button>
+            <DropdownMenu ref={_dropdown}>
+              <DropdownItem
+                onClick={() =>
+                  toast.promise(logoutFetcher.process({}), {
+                    pending: getLang().waitAMinute,
+                    success: getLang().succeed,
+                    error: getLang().failed,
+                  })
+                }
+                icon={RiLogoutCircleLine}
+                element="button"
+              >
+                {getLang().logout}
+              </DropdownItem>
+            </DropdownMenu>
           </div>
-          <div>
-            <CgChevronDown />
-          </div>
-          <button
-            type="button"
-            className="absolute top-0 left-0 w-full h-full rounded"
-            onClick={() => _dropdown.current?.toggle()}
-          ></button>
-          <DropdownMenu ref={_dropdown}>
-            <DropdownItem
-              onClick={() =>
-                toast.promise(logoutFetcher.process({}), {
-                  pending: getLang().waitAMinute,
-                  success: getLang().succeed,
-                  error: getLang().failed,
-                })
-              }
-              icon={RiLogoutCircleLine}
-              element="button"
-            >
-              {getLang().logout}
-            </DropdownItem>
-          </DropdownMenu>
         </div>
       </div>
-      <div className="flex-1 bg-white rounded border border-gray-400">
+      <div className="flex-1 bg-white rounded border border-gray-400 flex flex-col overflow-hidden">
         <Outlet />
       </div>
     </div>
