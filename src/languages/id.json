@@ -30,5 +30,7 @@
   "new": "Baru",
   "addUser": "Tambah Pengguna",
   "add": "Tambah",
-  "requiredMsg": "Tidak boleh kosong"
+  "requiredMsg": "Tidak boleh kosong",
+  "editUser": "Edit Pengguna",
+  "edit": "Edit"
 }

@@ -23,6 +23,7 @@ import DateField from "../../components/form/DateField";
 import { useForm, Controller } from "react-hook-form";
 import store from "../../apis/user/store";
 import { toast } from "react-toastify";
+import update from "../../apis/user/update";
 
 const defaultValues: UserData = {
   fullname: "",
@@ -35,7 +36,9 @@ const defaultValues: UserData = {
 
 export default function User() {
   const dispatch = useAppDispatch();
-  const { control: _composeModal } = useModal({});
+  const { control: _composeModal, state: _composeState } = useModal<{
+    edit: boolean;
+  }>({ initialState: { edit: false } });
   const {
     control,
     register,
@@ -48,6 +51,14 @@ export default function User() {
 
   const storeUserFetcher = useFetcher({
     api: store,
+    onSuccess: () => {
+      _composeModal.close();
+      userFetcher.process({});
+    },
+  });
+
+  const updateUserFetcher = useFetcher({
+    api: update,
     onSuccess: () => {
       _composeModal.close();
       userFetcher.process({});
@@ -80,7 +91,7 @@ export default function User() {
               color="green"
               onClick={() => {
                 reset(defaultValues);
-                _composeModal.open();
+                _composeModal.open({ edit: false });
               }}
               className="flex items-center"
             >
@@ -141,9 +152,21 @@ export default function User() {
             key: null,
             label: getLang().action,
             action: true,
-            render: () => (
+            render: (_, index) => (
               <div className="flex items-center justify-start space-x-2">
-                <MiniButton element={"button"} type="button" color="yellow">
+                <MiniButton
+                  element={"button"}
+                  type="button"
+                  color="yellow"
+                  onClick={() => {
+                    const { birthday, ...data } = userFetcher.data.data[index];
+                    reset({
+                      birthday: moment(birthday).format("YYYY-MM-DD"),
+                      ...data,
+                    });
+                    _composeModal.open({ edit: true });
+                  }}
+                >
                   <RiPencilLine className="text-lg" />
                 </MiniButton>
                 <MiniButton element={"button"} type="button" color="red">
@@ -154,14 +177,22 @@ export default function User() {
           },
         ]}
       />
-      <Modal control={_composeModal} title={getLang().addUser}>
+      <Modal
+        control={_composeModal}
+        title={_composeState.edit ? getLang().editUser : getLang().addUser}
+      >
         <form
           onSubmit={handleSubmit((data) =>
-            toast.promise(storeUserFetcher.process(data), {
-              pending: getLang().waitAMinute,
-              success: getLang().succeed,
-              error: getLang().failed,
-            })
+            toast.promise(
+              _composeState.edit
+                ? updateUserFetcher.process(data)
+                : storeUserFetcher.process(data),
+              {
+                pending: getLang().waitAMinute,
+                success: getLang().succeed,
+                error: getLang().failed,
+              }
+            )
           )}
         >
           <TextField
@@ -246,9 +277,9 @@ export default function User() {
             type="submit"
             element="button"
             className="w-full"
-            disabled={storeUserFetcher.isLoading}
+            disabled={storeUserFetcher.isLoading || updateUserFetcher.isLoading}
           >
-            {getLang().add}
+            {_composeState.edit ? getLang().edit : getLang().add}
           </Button>
         </form>
       </Modal>

@@ -30,14 +30,7 @@ export default function Table<T>({
 }: TableProps<T>) {
   return (
     <div className="flex-1 flex flex-col relative">
-      {loading && (
-        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10 flex justify-center items-center">
-          <div className="py-5 px-8 bg-white rounded">
-            {getLang().waitAMinute}
-          </div>
-        </div>
-      )}
-      <div className="border-b border-gray-400 flex justify-start items-center">
+      <div className="border-b border-gray-300 flex justify-start items-center">
         <div className="border-r border-gray-300 flex-1 lg:flex-0 w-auto lg:w-1/3 relative">
           <input
             type="text"
@@ -70,56 +63,66 @@ export default function Table<T>({
           {buttons}
         </div>
       </div>
-      <div className="overflow-x-auto relative flex-1">
-        <table
-          className="min-w-full border-collapse"
-          style={{ maxWidth: 9000 }}
-        >
-          <thead>
-            <tr>
-              {columns.map((item, index) => (
-                <th
-                  className="py-4 px-5 text-left shadow-sm shadow-gray-200 border-b border-gray-400 whitespace-nowrap"
-                  key={`${index}`}
-                  {...(item !== "indexing" && item.props ? item.props : {})}
-                >
-                  {item === "indexing"
-                    ? "#"
-                    : item.label || (item.key as string)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, rowIndex) => (
-              <tr
-                key={`${rowIndex}`}
-                className="bg-transparent hover:bg-gray-100 group"
-              >
+      <div className="relative flex-1">
+        <div className="absolute top-0 left-0 w-full h-full overflow-auto">
+          <table
+            className="min-w-full border-collapse"
+            style={{ maxWidth: 9000 }}
+          >
+            <thead className="sticky top-0 bg-white z-10 shadow shadow-gray-300">
+              <tr>
                 {columns.map((item, index) => (
-                  <td
+                  <th
+                    className="py-4 px-5 text-left whitespace-nowrap"
                     key={`${index}`}
-                    className={`py-4 px-5 text-sm border-b ${
-                      item !== "indexing" && item.action
-                        ? "sticky right-0 bg-white group-hover:bg-gray-100"
-                        : ""
-                    }`}
                     {...(item !== "indexing" && item.props ? item.props : {})}
                   >
                     {item === "indexing"
-                      ? index + 1
-                      : item.key
-                      ? !item.render
-                        ? (row[item.key!] as ReactNode)
-                        : item.render(row[item.key!], rowIndex)
-                      : item.render!(null, rowIndex)}
-                  </td>
+                      ? "#"
+                      : item.label || (item.key as string)}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((row, rowIndex) => (
+                <tr
+                  key={`${rowIndex}`}
+                  className="bg-transparent hover:bg-gray-100 group"
+                >
+                  {columns.map((item, index) => (
+                    <td
+                      key={`${index}`}
+                      className={`py-4 px-5 text-sm border-b ${
+                        item !== "indexing" && item.action
+                          ? "sticky right-0 bg-white group-hover:bg-gray-100"
+                          : ""
+                      }`}
+                      {...(item !== "indexing" && item.props ? item.props : {})}
+                    >
+                      {item === "indexing"
+                        ? rowIndex + 1
+                        : item.key
+                        ? !item.render
+                          ? (row[item.key!] as ReactNode)
+                          : item.render(row[item.key!], rowIndex)
+                        : item.render!(null, rowIndex)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {loading && (
+        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10 flex justify-center items-center">
+          <div className="py-5 px-8 bg-white rounded">
+            {getLang().waitAMinute}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

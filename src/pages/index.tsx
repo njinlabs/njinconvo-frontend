@@ -81,7 +81,7 @@ export default function Layout() {
 
   return (
     <div className="w-full min-h-screen bg-gray-200 flex flex-col justify-start space-y-3 px-5 lg:px-8 pb-3 overflow-x-hidden">
-      <div className="h-20 flex justify-between items-center relative z-10">
+      <div className="h-20 flex justify-between items-center relative z-20">
         <div className="flex-1 flex justify-start items-center transform -translate-x-3 lg:translate-x-0">
           <button
             type="button"
@@ -122,7 +122,7 @@ export default function Layout() {
             onBlur={(e) => _dropdown.current?.onBlur(e)}
             className="relative flex items-center justify-end space-x-5 p-3 px-5 rounded"
           >
-            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 flex-shrink-0 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
               {user?.avatar && typeof user.avatar === "string" ? (
                 <img src={user.avatar} className="w-full h-full object-cover" />
               ) : (
