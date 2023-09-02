@@ -32,5 +32,10 @@
   "add": "Tambah",
   "requiredMsg": "Tidak boleh kosong",
   "editUser": "Edit Pengguna",
-  "edit": "Edit"
+  "edit": "Edit",
+  "sure": "Yakin?",
+  "destroyUser": "Anda akan menghapus pengguna ini",
+  "signOutConfirmation": "Anda akan keluar dari akun ini",
+  "cancel": "Batal",
+  "yesConfirm": "Ya, Lanjutkan!"
 }

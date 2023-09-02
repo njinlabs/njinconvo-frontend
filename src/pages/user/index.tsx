@@ -1,29 +1,31 @@
 import moment from "moment";
-import index from "../../apis/user";
-import Table from "../../components/table/Table";
-import { UserData } from "../../redux/slices/user";
-import { useFetcher } from "../../utilities/fetcher";
 import { Fragment, useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  RiUser6Fill,
-  RiPencilLine,
-  RiDeleteBin2Line,
   RiAddBoxLine,
+  RiDeleteBin2Line,
+  RiPencilLine,
+  RiUser6Fill,
 } from "react-icons/ri";
-import MiniButton from "../../components/MiniButton";
-import { useAppDispatch } from "../../redux/hooks";
-import { setWeb } from "../../redux/slices/web";
-import getLang from "../../languages";
-import Modal from "../../components/modal";
-import { useModal } from "../../components/modal/useModal";
+import { toast } from "react-toastify";
+import index from "../../apis/user";
+import destroy from "../../apis/user/destroy";
+import store from "../../apis/user/store";
+import update from "../../apis/user/update";
 import Button from "../../components/Button";
+import MiniButton from "../../components/MiniButton";
+import DateField from "../../components/form/DateField";
 import TextField from "../../components/form/TextField";
 import { BasicSelectField } from "../../components/form/select-field";
-import DateField from "../../components/form/DateField";
-import { useForm, Controller } from "react-hook-form";
-import store from "../../apis/user/store";
-import { toast } from "react-toastify";
-import update from "../../apis/user/update";
+import Modal from "../../components/modal";
+import { useModal } from "../../components/modal/useModal";
+import Table from "../../components/table/Table";
+import getLang from "../../languages";
+import { useAppDispatch } from "../../redux/hooks";
+import { UserData } from "../../redux/slices/user";
+import { setWeb } from "../../redux/slices/web";
+import { useFetcher } from "../../utilities/fetcher";
+import { warningAlert } from "../../utilities/sweet-alert";
 
 const defaultValues: UserData = {
   fullname: "",
@@ -67,6 +69,13 @@ export default function User() {
 
   const userFetcher = useFetcher({
     api: index,
+  });
+
+  const destroyFetcher = useFetcher({
+    api: destroy,
+    onSuccess: () => {
+      userFetcher.process({});
+    },
   });
 
   useEffect(() => {
@@ -169,7 +178,33 @@ export default function User() {
                 >
                   <RiPencilLine className="text-lg" />
                 </MiniButton>
-                <MiniButton element={"button"} type="button" color="red">
+                <MiniButton
+                  element={"button"}
+                  type="button"
+                  color="red"
+                  onClick={() =>
+                    warningAlert({
+                      title: getLang().sure,
+                      text: getLang().destroyUser,
+                      showCancelButton: true,
+                      cancelButtonText: getLang().cancel,
+                      confirmButtonText: getLang().yesConfirm,
+                    }).then((value) => {
+                      if (value.isConfirmed) {
+                        toast.promise(
+                          destroyFetcher.process({
+                            id: userFetcher.data.data[index].id,
+                          }),
+                          {
+                            success: getLang().succeed,
+                            pending: getLang().waitAMinute,
+                            error: getLang().failed,
+                          }
+                        );
+                      }
+                    })
+                  }
+                >
                   <RiDeleteBin2Line className="text-lg" />
                 </MiniButton>
               </div>

@@ -20,6 +20,7 @@ import NavbarList from "../components/NavbarList";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { clearUser, setUser } from "../redux/slices/user";
 import { useLocation } from "react-router-dom";
+import { warningAlert } from "../utilities/sweet-alert";
 
 export default function Layout() {
   const cookie = useCookies(["token"]);
@@ -147,13 +148,23 @@ export default function Layout() {
             ></button>
             <DropdownMenu ref={_dropdown}>
               <DropdownItem
-                onClick={() =>
-                  toast.promise(logoutFetcher.process({}), {
-                    pending: getLang().waitAMinute,
-                    success: getLang().succeed,
-                    error: getLang().failed,
-                  })
-                }
+                onClick={() => {
+                  warningAlert({
+                    title: getLang().sure,
+                    text: getLang().signOutConfirmation,
+                    showCancelButton: true,
+                    cancelButtonText: getLang().cancel,
+                    confirmButtonText: getLang().yesConfirm,
+                  }).then((value) => {
+                    if (value.isConfirmed) {
+                      toast.promise(logoutFetcher.process({}), {
+                        pending: getLang().waitAMinute,
+                        success: getLang().succeed,
+                        error: getLang().failed,
+                      });
+                    }
+                  });
+                }}
                 icon={RiLogoutCircleLine}
                 element="button"
               >
