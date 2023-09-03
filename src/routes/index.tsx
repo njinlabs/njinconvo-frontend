@@ -3,6 +3,7 @@ import Layout from "../pages";
 import authRoutes from "./Auth";
 import userRoute from "./User";
 import Error from "../pages/Error";
+import Dashboard from "../pages/dashboard";
 
 const router = createBrowserRouter([
   authRoutes,
@@ -10,7 +11,14 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     errorElement: <Error />,
-    children: [userRoute],
+    children: [
+      {
+        path: "",
+        element: <Dashboard />,
+        index: true,
+      },
+      userRoute,
+    ],
   },
 ]);
 

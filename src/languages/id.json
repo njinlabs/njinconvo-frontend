@@ -41,5 +41,9 @@
   "activity": "Aktivitas",
   "chat": "Pesan",
   "notAllowed": "Tidak Diperbolehkan",
-  "sorry": "Maaf"
+  "sorry": "Maaf",
+  "createClassroom": "Buat Kelas",
+  "start": "Mulai",
+  "participants": "Peserta",
+  "noDataYet": "Belum ada data"
 }
