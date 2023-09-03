@@ -45,5 +45,6 @@
   "createClassroom": "Buat Kelas",
   "start": "Mulai",
   "participants": "Peserta",
-  "noDataYet": "Belum ada data"
+  "noDataYet": "Belum ada data",
+  "name": "Nama"
 }
