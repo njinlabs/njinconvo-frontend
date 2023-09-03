@@ -26,7 +26,6 @@ import { UserData } from "../../redux/slices/user";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import { warningAlert } from "../../utilities/sweet-alert";
-import { Helmet } from "react-helmet-async";
 
 const defaultValues: UserData = {
   fullname: "",
