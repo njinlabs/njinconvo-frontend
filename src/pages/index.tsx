@@ -131,7 +131,7 @@ export default function Layout() {
     }
   }, [cookies]);
 
-  if (!mount) return null;
+  if (!mount || !cookies.token || !user) return null;
 
   return (
     <div className="w-full min-h-screen bg-gray-200 flex flex-col justify-start space-y-3 px-5 lg:px-8 pb-3 overflow-x-hidden">
