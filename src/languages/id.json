@@ -1,8 +1,8 @@
 {
   "loginGreeting": "Halo, Silahkan login!",
   "email": "Email",
-  "password": "Password",
-  "forgotPassword": "Lupa password?",
+  "password": "Kata Sandi",
+  "forgotPassword": "Lupa kata sandi?",
   "signIn": "Masuk",
   "waitAMinute": "Tunggu sebentar...",
   "succeed": "Berhasil",
@@ -40,5 +40,6 @@
   "yesConfirm": "Ya, Lanjutkan!",
   "activity": "Aktivitas",
   "chat": "Pesan",
-  "notAllowed": "Tidak Diperbolehkan"
+  "notAllowed": "Tidak Diperbolehkan",
+  "sorry": "Maaf"
 }

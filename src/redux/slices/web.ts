@@ -1,11 +1,14 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import getLang from "../../languages";
 
 export type WebSlice = {
   active: string;
+  pageTitle: string;
 };
 
 const initialState: WebSlice = {
   active: "dashboard",
+  pageTitle: getLang().dashboard,
 };
 
 export const webSlice = createSlice({
