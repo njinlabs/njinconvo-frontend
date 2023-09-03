@@ -4,6 +4,7 @@ import authRoutes from "./Auth";
 import userRoute from "./User";
 import Error from "../pages/Error";
 import Dashboard from "../pages/dashboard";
+import classroomRoute from "./Classroom";
 
 const router = createBrowserRouter([
   authRoutes,
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
         index: true,
       },
       userRoute,
+      classroomRoute,
     ],
   },
 ]);

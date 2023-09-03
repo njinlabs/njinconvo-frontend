@@ -78,6 +78,7 @@ export default function TeacherDashboard() {
                 {((classroomFetcher.data?.data as any[]) || []).map(
                   (item, index) => (
                     <ClassroomList
+                      id={item.id}
                       name={item.name}
                       teacher={{
                         fullname: item.teacher.fullname,

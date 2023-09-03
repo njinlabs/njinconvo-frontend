@@ -1,8 +1,8 @@
-import { useAppSelector } from "../redux/hooks";
-import { ReactNode, Fragment } from "react";
-import { RiErrorWarningLine } from "react-icons/ri";
-import getLang from "../languages";
+import { Fragment, ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
+import getLang from "../languages";
+import { useAppSelector } from "../redux/hooks";
+import NotAllowed from "../components/NotAllowed";
 
 export default function Private({
   privateFor,
@@ -20,10 +20,7 @@ export default function Private({
       <Helmet>
         <title>{getLang().notAllowed}</title>
       </Helmet>
-      <div className="flex-1 flex flex-col justify-center items-center">
-        <RiErrorWarningLine className="text-6xl text-primary-500" />
-        {getLang().notAllowed}
-      </div>
+      <NotAllowed />
     </Fragment>
   );
 }

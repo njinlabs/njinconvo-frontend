@@ -4,10 +4,12 @@ import MiniButton from "./MiniButton";
 import getLang from "../languages";
 
 export default function ClassroomList({
+  id,
   name,
   teacher,
   participants,
 }: {
+  id: number;
   name: string;
   participants: number;
   teacher: {
@@ -36,7 +38,7 @@ export default function ClassroomList({
         </span>
         <MiniButton
           element={Link}
-          to="/"
+          to={"/classroom/" + id}
           className="text-xs uppercase"
           color="basic"
         >
