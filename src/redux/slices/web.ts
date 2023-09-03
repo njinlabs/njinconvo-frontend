@@ -5,7 +5,7 @@ export type WebSlice = {
 };
 
 const initialState: WebSlice = {
-  active: "Dashboard",
+  active: "dashboard",
 };
 
 export const webSlice = createSlice({

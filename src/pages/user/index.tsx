@@ -82,7 +82,7 @@ export default function User() {
     userFetcher.process({});
     dispatch(
       setWeb({
-        active: "User",
+        active: "user",
       })
     );
   }, []);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ComponentProps } from "react";
 import { useCookies } from "react-cookie";
 import { Outlet, useNavigate } from "react-router-dom";
 import { CgChevronDown } from "react-icons/cg";
@@ -21,6 +21,59 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { clearUser, setUser } from "../redux/slices/user";
 import { useLocation } from "react-router-dom";
 import { warningAlert } from "../utilities/sweet-alert";
+
+const menus: {
+  [key: string]: (Partial<ComponentProps<typeof NavbarList>> & {
+    name: string;
+  })[];
+} = {
+  administrator: [
+    {
+      to: "/",
+      name: "dashboard",
+    },
+    {
+      to: "/classroom",
+      name: "classroom",
+    },
+    {
+      to: "/user",
+      name: "user",
+    },
+    {
+      to: "/setting",
+      name: "setting",
+    },
+  ],
+  teacher: [
+    {
+      to: "/",
+      name: "dashboard",
+    },
+    {
+      to: "/activity",
+      name: "activity",
+    },
+    {
+      to: "/chat",
+      name: "chat",
+    },
+  ],
+  student: [
+    {
+      to: "/",
+      name: "dashboard",
+    },
+    {
+      to: "/activity",
+      name: "activity",
+    },
+    {
+      to: "/chat",
+      name: "chat",
+    },
+  ],
+};
 
 export default function Layout() {
   const cookie = useCookies(["token"]);
@@ -104,18 +157,18 @@ export default function Layout() {
           } lg:translate-y-0 lg:opacity-100 transition duration-1000`}
         >
           <div className="w-full flex flex-col lg:flex-row justify-start lg:justify-center space-y-1 lg:space-y-0 space-x-0 lg:space-x-1 bg-white lg:bg-transparent rounded py-5 px-2 lg:p-0 shadow-md shadow-gray-200 lg:shadow-none">
-            <NavbarList to="/" active={web.active === "Dashboard"}>
-              {getLang().dashboard}
-            </NavbarList>
-            <NavbarList to="/" active={web.active === ""}>
-              {getLang().classroom}
-            </NavbarList>
-            <NavbarList to="/user" active={web.active === "User"}>
-              {getLang().user}
-            </NavbarList>
-            <NavbarList to="/" active={web.active === ""}>
-              {getLang().setting}
-            </NavbarList>
+            {menus[user?.role! as keyof typeof menus].map(
+              ({ name, to, ...props }, index) => (
+                <NavbarList
+                  {...props}
+                  to={to!}
+                  active={web.active === name}
+                  key={`${index}`}
+                >
+                  {getLang()[name as keyof typeof getLang]}
+                </NavbarList>
+              )
+            )}
           </div>
         </div>
         <div className="flex-0 lg:flex-1 flex justify-end transform translate-x-5">
