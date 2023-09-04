@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import getLang from "../../languages";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
-import TeacherDashboard from "./TeacherDashboard";
+import UserDashboard from "./UserDashboard";
 
 export default function Dashboard() {
   const { data: user } = useAppSelector((state) => state.user);
@@ -17,6 +17,7 @@ export default function Dashboard() {
     );
   }, []);
 
-  if (user?.role === "teacher") return <TeacherDashboard />;
+  if (user?.role === "teacher" || user?.role === "student")
+    return <UserDashboard />;
   return null;
 }

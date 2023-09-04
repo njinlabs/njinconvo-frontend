@@ -50,5 +50,9 @@
   "meeting": "Pertemuan",
   "detail": "Detail",
   "delete": "Hapus",
-  "invite": "Undang"
+  "invite": "Undang",
+  "join": "Gabung",
+  "classroomCode": "Kode Kelas",
+  "next": "Lanjutkan",
+  "hasJoined": "Sudah bergabung"
 }
