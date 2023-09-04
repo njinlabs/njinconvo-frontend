@@ -54,5 +54,7 @@
   "join": "Gabung",
   "classroomCode": "Kode Kelas",
   "next": "Lanjutkan",
-  "hasJoined": "Sudah bergabung"
+  "hasJoined": "Sudah bergabung",
+  "leave": "Tinggalkan",
+  "option": "Opsi"
 }

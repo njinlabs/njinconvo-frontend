@@ -8,6 +8,7 @@ import {
   RiSearch2Line,
   RiUser6Fill,
   RiUserAddLine,
+  RiLogoutCircleLine,
 } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import show from "../../apis/classroom/show";
@@ -59,15 +60,18 @@ export default function Detail() {
             </div>
           </div>
           <div className="flex items-center justify-end ml-auto px-5 space-x-3">
-            <Button
-              element={"button"}
-              type="button"
-              color="green"
-              className="flex items-center"
-            >
-              <RiAddBoxLine className="text-base lg:text-sm mr-2" />
-              <span>{getLang().meeting}</span>
-            </Button>
+            {classroomShowFetcher.data?.has_joined?.classroom_role ===
+              "teacher" && (
+              <Button
+                element={"button"}
+                type="button"
+                color="green"
+                className="flex items-center"
+              >
+                <RiAddBoxLine className="text-base lg:text-sm mr-2" />
+                <span>{getLang().meeting}</span>
+              </Button>
+            )}
             <Button
               element={"button"}
               type="button"
@@ -78,6 +82,10 @@ export default function Detail() {
               }}
             >
               <RiMoreFill className="text-base lg:text-sm" />
+              {classroomShowFetcher.data?.has_joined?.classroom_role ===
+                "student" && (
+                <span className="ml-2 uppercase">{getLang().option}</span>
+              )}
             </Button>
           </div>
         </div>
@@ -100,14 +108,17 @@ export default function Detail() {
             </div>
             <div>{classroomShowFetcher.data?.code}</div>
           </div>
-          <MiniButton
-            element={"button"}
-            color="basic"
-            type="button"
-            className="py-2"
-          >
-            <RiPencilFill />
-          </MiniButton>
+          {classroomShowFetcher.data?.has_joined?.classroom_role ===
+            "teacher" && (
+            <MiniButton
+              element={"button"}
+              color="basic"
+              type="button"
+              className="py-2"
+            >
+              <RiPencilFill />
+            </MiniButton>
+          )}
         </div>
         <div className="flex justify-start items-center space-x-3 border-b border-gray-300 pb-5 mb-5">
           <Button
@@ -128,15 +139,28 @@ export default function Detail() {
             <RiUserAddLine />
             <span>{getLang().invite}</span>
           </Button>
-          <Button
-            type="button"
-            element={"button"}
-            color="red"
-            className="flex justify-start items-center space-x-2"
-          >
-            <RiDeleteBin2Line />
-            <span>{getLang().delete}</span>
-          </Button>
+          {classroomShowFetcher.data?.has_joined?.classroom_role ===
+          "teacher" ? (
+            <Button
+              type="button"
+              element={"button"}
+              color="red"
+              className="flex justify-start items-center space-x-2"
+            >
+              <RiDeleteBin2Line />
+              <span>{getLang().delete}</span>
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              element={"button"}
+              color="red"
+              className="flex justify-start items-center space-x-2"
+            >
+              <RiLogoutCircleLine />
+              <span>{getLang().leave}</span>
+            </Button>
+          )}
         </div>
         <div className="font-bold text-gray-700 font-montserrat">
           {getLang().participants}

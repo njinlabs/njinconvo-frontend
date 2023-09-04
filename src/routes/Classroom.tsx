@@ -1,6 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import Classroom from "../pages/classroom";
 import Detail from "../pages/classroom/Detail";
+import Private from "../pages/Private";
 
 const classroomRoute: RouteObject = {
   path: "classroom",
@@ -8,7 +9,11 @@ const classroomRoute: RouteObject = {
   children: [
     {
       path: ":id",
-      element: <Detail />,
+      element: (
+        <Private privateFor={["teacher", "student"]}>
+          <Detail />
+        </Private>
+      ),
     },
   ],
 };
