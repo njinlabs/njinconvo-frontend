@@ -21,11 +21,17 @@ import getLang from "../../languages";
 import { useFetcher } from "../../utilities/fetcher";
 import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
+import participants from "../../apis/classroom/participants";
+import List from "../../components/List";
 
 export default function Detail() {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const { control: _infoModal } = useModal({});
+
+  const participantsFetcher = useFetcher({
+    api: participants,
+  });
 
   const classroomShowFetcher = useFetcher({
     api: show,
@@ -78,6 +84,12 @@ export default function Detail() {
               color="basic"
               className="flex items-center"
               onClick={() => {
+                if (
+                  !participantsFetcher.isLoading &&
+                  !participantsFetcher.data
+                ) {
+                  participantsFetcher.process({ id: id! });
+                }
                 _infoModal.open();
               }}
             >
@@ -162,9 +174,27 @@ export default function Detail() {
             </Button>
           )}
         </div>
-        <div className="font-bold text-gray-700 font-montserrat">
+        <div className="font-bold text-gray-700 font-montserrat mb-5">
           {getLang().participants}
         </div>
+        {participantsFetcher.isLoading ? (
+          <div className="text-center">{getLang().waitAMinute}</div>
+        ) : (
+          <div className="flex flex-col space-y-3">
+            {((participantsFetcher.data as Array<any>) || []).map(
+              (item, index) => (
+                <List
+                  key={`${index}`}
+                  title={item.fullname}
+                  photo={item.avatar || <RiUser6Fill />}
+                  subtitle={
+                    getLang()[item.classroom_role as keyof typeof getLang]
+                  }
+                />
+              )
+            )}
+          </div>
+        )}
       </Modal>
     </Fragment>
   );
