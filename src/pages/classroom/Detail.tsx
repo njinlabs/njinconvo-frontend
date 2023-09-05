@@ -10,7 +10,7 @@ import {
   RiUserAddLine,
   RiLogoutCircleLine,
 } from "react-icons/ri";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import show from "../../apis/classroom/show";
 import Button from "../../components/Button";
 import MiniButton from "../../components/MiniButton";
@@ -69,8 +69,8 @@ export default function Detail() {
             {classroomShowFetcher.data?.has_joined?.classroom_role ===
               "teacher" && (
               <Button
-                element={"button"}
-                type="button"
+                element={Link}
+                to="meeting"
                 color="green"
                 className="flex items-center"
               >

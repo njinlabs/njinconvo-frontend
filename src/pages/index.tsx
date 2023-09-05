@@ -161,7 +161,7 @@ export default function Layout() {
                 : "-translate-y-[120%] opacity-0"
             } lg:translate-y-0 lg:opacity-100 transition duration-1000`}
           >
-            <div className="w-full flex flex-col lg:flex-row justify-start lg:justify-center space-y-1 lg:space-y-0 space-x-0 lg:space-x-1 bg-white lg:bg-transparent rounded py-5 px-2 lg:p-0 shadow-md shadow-gray-200 lg:shadow-none">
+            <div className="w-full flex flex-col lg:flex-row justify-start lg:justify-center space-y-1 lg:space-y-0 space-x-0 lg:space-x-1 bg-white lg:bg-transparent rounded py-5 px-2 lg:p-0 shadow-md shadow-gray-200 lg:shadow-none border border-gray-400 lg:border-0">
               {menus[user?.role! as keyof typeof menus].map(
                 ({ name, to, ...props }, index) => (
                   <NavbarList

@@ -51,3 +51,8 @@ button {
 .alert .swal2-confirm {
   @apply bg-primary-500 text-white rounded !important;
 }
+
+.w-md-editor-preview p,
+.w-md-editor-preview {
+  @apply prose max-w-full !important;
+}

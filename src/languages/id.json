@@ -56,5 +56,9 @@
   "next": "Lanjutkan",
   "hasJoined": "Sudah bergabung",
   "leave": "Tinggalkan",
-  "option": "Opsi"
+  "option": "Opsi",
+  "newMeeting": "Pertemuan Baru",
+  "save": "Simpan",
+  "title": "Judul",
+  "publish": "Publish"
 }

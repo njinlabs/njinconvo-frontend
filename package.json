@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
+    "@uiw/react-md-editor": "^3.23.5",
     "axios": "^1.5.0",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
@@ -30,6 +31,7 @@
     "sweetalert2-react-content": "^5.0.7"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
