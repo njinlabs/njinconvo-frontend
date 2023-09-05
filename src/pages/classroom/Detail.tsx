@@ -23,6 +23,9 @@ import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import participants from "../../apis/classroom/participants";
 import List from "../../components/List";
+import index from "../../apis/classroom/meeting";
+import NotFound from "../../components/NotFound";
+import moment from "moment";
 
 export default function Detail() {
   const { id } = useParams();
@@ -44,8 +47,13 @@ export default function Detail() {
     },
   });
 
+  const meetingsFetcher = useFetcher({
+    api: index,
+  });
+
   useEffect(() => {
     classroomShowFetcher.process({ id: id! });
+    meetingsFetcher.process({ classroomId: id! });
   }, [id]);
 
   if (!classroomShowFetcher.data && !classroomShowFetcher.isLoading)
@@ -101,6 +109,46 @@ export default function Detail() {
             </Button>
           </div>
         </div>
+        {!meetingsFetcher.data?.data?.length && !meetingsFetcher.isLoading ? (
+          <NotFound />
+        ) : (
+          <div className="flex-1 overflow-auto">
+            <div className="grid grid-flow-row grid-cols-3 p-5 gap-5">
+              {((meetingsFetcher.data?.data as Array<any>) || []).map(
+                (item, index) => (
+                  <List
+                    key={`${index}`}
+                    title={item.title}
+                    subtitle={
+                      <div
+                        className={
+                          classroomShowFetcher.data?.has_joined
+                            ?.classroom_role === "teacher"
+                            ? "mt-1"
+                            : ""
+                        }
+                      >
+                        {classroomShowFetcher.data?.has_joined
+                          ?.classroom_role === "teacher" &&
+                          (item.is_draft ? (
+                            <span className="uppercase inline-table mr-2 text-xs bg-yellow-300 border border-yellow-400 p-1 rounded">
+                              {getLang().draft}
+                            </span>
+                          ) : (
+                            <span className="uppercase inline-table mr-2 text-xs bg-blue-300 border border-blue-400 p-1 rounded">
+                              {getLang().published}
+                            </span>
+                          ))}
+                        {moment(item.created_at).format("D MMMM YYYY, HH:mm")}
+                      </div>
+                    }
+                    to={`/classroom/${id}/meeting/${item.id}`}
+                  />
+                )
+              )}
+            </div>
+          </div>
+        )}
       </div>
       <Modal control={_infoModal} title={getLang().detail}>
         <div className="flex justify-start items-center space-x-5 mb-6 group-hover:bg-gray-100">

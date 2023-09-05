@@ -60,5 +60,7 @@
   "newMeeting": "Pertemuan Baru",
   "save": "Simpan",
   "title": "Judul",
-  "publish": "Publish"
+  "publish": "Terbitkan",
+  "draft": "Konsep",
+  "published": "Terbit"
 }
