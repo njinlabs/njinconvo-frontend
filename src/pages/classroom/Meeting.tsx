@@ -158,6 +158,9 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                       element={"button"}
                       type="button"
                       className="flex justify-start items-center space-x-2"
+                      disabled={
+                        storeFetcher.isLoading || updateFetcher.isLoading
+                      }
                       onClick={(e: React.BaseSyntheticEvent) =>
                         handleSubmit((data) =>
                           toast.promise(

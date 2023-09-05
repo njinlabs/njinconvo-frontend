@@ -6,6 +6,7 @@ import { RiAddLine } from "react-icons/ri";
 export type ButtonProps<T extends typeof Link | "button" = "button"> = {
   element: T;
   children?: ReactNode;
+  iconClassName?: string;
   icon: IconType;
 };
 
@@ -15,6 +16,7 @@ export default function DropdownItem<T extends typeof Link | "button">({
   color = "primary",
   className,
   icon: Icon = RiAddLine,
+  iconClassName,
   ...props
 }: ButtonProps<any> & HTMLProps<HTMLButtonElement> & ComponentProps<T>) {
   return (
@@ -22,8 +24,8 @@ export default function DropdownItem<T extends typeof Link | "button">({
       {...props}
       className={`rounded flex items-center py-4 justify-start text-left bg-white hover:bg-gray-100 text-gray-600 text-sm ${className}`}
     >
-      <div className="w-12 flex justify-center text-gray-800">
-        <Icon className="text-lg" />
+      <div className={`w-12 flex justify-center text-gray-800`}>
+        <Icon className={`text-lg ${iconClassName}`} />
       </div>
       <div className="flex-1">{children}</div>
     </Element>

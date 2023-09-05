@@ -26,6 +26,10 @@ import List from "../../components/List";
 import index from "../../apis/classroom/meeting";
 import NotFound from "../../components/NotFound";
 import moment from "moment";
+import { DropdownItem } from "../../components/dropdown";
+import { toast } from "react-toastify";
+import { warningAlert } from "../../utilities/sweet-alert";
+import destroy from "../../apis/classroom/meeting/destroy";
 
 export default function Detail() {
   const { id } = useParams();
@@ -49,6 +53,13 @@ export default function Detail() {
 
   const meetingsFetcher = useFetcher({
     api: index,
+  });
+
+  const destroyMeetingFetcher = useFetcher({
+    api: destroy,
+    onSuccess: () => {
+      meetingsFetcher.process({ classroomId: id! });
+    },
   });
 
   useEffect(() => {
@@ -121,6 +132,42 @@ export default function Detail() {
                   <List
                     key={`${index}`}
                     title={item.title}
+                    options={
+                      <Fragment>
+                        <DropdownItem
+                          element={"button"}
+                          type="button"
+                          icon={RiDeleteBin2Line}
+                          className="text-red-600"
+                          iconClassName="text-red-500"
+                          onClick={() =>
+                            warningAlert({
+                              title: getLang().sure,
+                              text: getLang().meetingDestroyConfirmation,
+                              showCancelButton: true,
+                              cancelButtonText: getLang().cancel,
+                              confirmButtonText: getLang().yesConfirm,
+                            }).then((value) => {
+                              if (value.isConfirmed) {
+                                toast.promise(
+                                  destroyMeetingFetcher.process({
+                                    classroomId: id!,
+                                    id: item.id,
+                                  }),
+                                  {
+                                    pending: getLang().waitAMinute,
+                                    success: getLang().succeed,
+                                    error: getLang().failed,
+                                  }
+                                );
+                              }
+                            })
+                          }
+                        >
+                          {getLang().delete}
+                        </DropdownItem>
+                      </Fragment>
+                    }
                     subtitle={
                       <div
                         className={

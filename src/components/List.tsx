@@ -32,11 +32,17 @@ export default function List({
         <div className="text-sm">{subtitle}</div>
       </div>
       {options && (
-        <div className="relative" onBlur={(e) => _dropdown.current?.onBlur(e)}>
+        <div
+          className="relative z-10"
+          onBlur={(e) => _dropdown.current?.onBlur(e)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               _dropdown.current?.toggle();
             }}
             className="p-2 bg-gray-100 border rounded text-gray-500"
@@ -46,6 +52,7 @@ export default function List({
           <DropdownMenu ref={_dropdown}>{options}</DropdownMenu>
         </div>
       )}
+
       {to && (
         <Link to={to} className="absolute top-0 left-0 w-full h-full"></Link>
       )}

@@ -62,5 +62,6 @@
   "title": "Judul",
   "publish": "Terbitkan",
   "draft": "Konsep",
-  "published": "Terbit"
+  "published": "Terbit",
+  "meetingDestroyConfirmation": "Anda yakin ingin menghapus pertemuan ini?"
 }
