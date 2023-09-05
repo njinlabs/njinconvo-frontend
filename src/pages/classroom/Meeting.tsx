@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { RiCloseFill, RiPencilLine, RiSave2Line } from "react-icons/ri";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import show from "../../apis/classroom/meeting/show";
 import store, { MeetingParams } from "../../apis/classroom/meeting/store";
@@ -15,6 +15,7 @@ import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import MDEditor from "@uiw/react-md-editor";
 import NotAllowed from "../../components/NotAllowed";
+import update from "../../apis/classroom/meeting/update";
 
 const defaultValues: MeetingParams = {
   title: "",
@@ -24,6 +25,7 @@ const defaultValues: MeetingParams = {
 
 export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
   const [edit, setEdit] = useState(autoEdit);
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
   const { classroomId, id } = useParams();
@@ -43,6 +45,20 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
 
   const storeFetcher = useFetcher({
     api: store,
+    onSuccess: (data) => {
+      setEdit(false);
+      navigate(`/classroom/${classroomId}/meeting/${data.id}`, {
+        replace: true,
+      });
+    },
+  });
+
+  const updateFetcher = useFetcher({
+    api: update,
+    onSuccess: () => {
+      setEdit(false);
+      showFetcher.process({ id: id!, classroomId: classroomId! });
+    },
   });
 
   useEffect(() => {
@@ -145,10 +161,16 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                       onClick={(e: React.BaseSyntheticEvent) =>
                         handleSubmit((data) =>
                           toast.promise(
-                            storeFetcher.process({
-                              ...data,
-                              classroom_id: classroomId,
-                            }),
+                            showFetcher.data?.id
+                              ? updateFetcher.process({
+                                  ...data,
+                                  classroom_id: classroomId,
+                                  id,
+                                })
+                              : storeFetcher.process({
+                                  ...data,
+                                  classroom_id: classroomId,
+                                }),
                             {
                               pending: getLang().waitAMinute,
                               success: getLang().succeed,

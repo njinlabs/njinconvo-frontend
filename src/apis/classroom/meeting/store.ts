@@ -1,6 +1,7 @@
 import client from "../../client";
 
 export type MeetingParams = {
+  id?: number | string;
   title: string;
   description: string;
   is_draft: boolean;
