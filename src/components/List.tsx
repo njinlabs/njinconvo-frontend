@@ -19,7 +19,7 @@ export default function List({
   const _dropdown = useRef<DropdownMenuRefObject>();
 
   return (
-    <div className="p-5 border border-gray-300 rounded flex justify-start items-start space-x-5 relative">
+    <div className="p-5 border border-gray-300 bg-white hover:bg-gray-100 rounded flex justify-start items-start space-x-5 relative">
       {photo && typeof photo === "string" ? (
         <img src={photo} className="w-12 h-12 object-cover rounded-full" />
       ) : photo ? (

@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import Compose from "../pages/classroom/meeting/Compose";
+import Meeting from "../pages/classroom/Meeting";
 
 const meetingRoute: RouteObject = {
   path: ":classroomId/meeting",
@@ -7,7 +7,11 @@ const meetingRoute: RouteObject = {
     {
       path: "",
       index: true,
-      element: <Compose />,
+      element: <Meeting />,
+    },
+    {
+      path: ":id",
+      element: <Meeting autoEdit={false} />,
     },
   ],
 };

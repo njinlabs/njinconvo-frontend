@@ -52,8 +52,10 @@ export default function Detail() {
   });
 
   useEffect(() => {
-    classroomShowFetcher.process({ id: id! });
-    meetingsFetcher.process({ classroomId: id! });
+    if (id) {
+      classroomShowFetcher.process({ id: id! });
+      meetingsFetcher.process({ classroomId: id! });
+    }
   }, [id]);
 
   if (!classroomShowFetcher.data && !classroomShowFetcher.isLoading)
