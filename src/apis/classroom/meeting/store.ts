@@ -7,6 +7,17 @@ export type LinkType = {
   url: string;
 };
 
+export type FileObject = {
+  name: string;
+  size: number;
+};
+
+export type FileType = {
+  id?: number | string;
+  rowId?: number | string;
+  file: File | FileObject | null;
+};
+
 export type MeetingParams = {
   id?: number | string;
   title: string;
@@ -14,13 +25,36 @@ export type MeetingParams = {
   is_draft: boolean;
   classroom_id?: number | string;
   links?: LinkType[];
+  files?: FileType[];
 };
 
 export default function store({
   classroom_id: classroomId,
+  files,
+  links,
   ...data
 }: MeetingParams) {
+  const formData = new FormData();
+  for (const key in data) {
+    formData.append(key, `${data[key as keyof typeof data]!}`);
+  }
+
+  let i = 0;
+  for (const link of links || []) {
+    formData.append(`links[${i}][title]`, `${link.title}`);
+    formData.append(`links[${i}][url]`, `${link.url}`);
+    i++;
+  }
+
+  i = 0;
+  for (const file of files || []) {
+    if (file.file instanceof File) {
+      formData.append(`files[${i}]`, file.file);
+    }
+    i++;
+  }
+
   return client
-    .post(`/classroom/${classroomId}/meeting`, data)
+    .post(`/classroom/${classroomId}/meeting`, formData)
     .then((response) => response.data);
 }

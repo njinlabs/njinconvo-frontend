@@ -1,9 +1,16 @@
-import { Fragment, useEffect, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import MDEditor from "@uiw/react-md-editor";
+import { Fragment, LegacyRef, useEffect, useRef, useState } from "react";
+import {
+  Controller,
+  FieldArrayWithId,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
 import {
   RiAddCircleFill,
   RiCloseFill,
   RiDeleteBin2Line,
+  RiDownloadCloud2Line,
   RiPencilLine,
   RiSave2Line,
 } from "react-icons/ri";
@@ -11,31 +18,32 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import show from "../../apis/classroom/meeting/show";
 import store, {
+  FileType,
   LinkType,
   MeetingParams,
 } from "../../apis/classroom/meeting/store";
+import update from "../../apis/classroom/meeting/update";
 import Button from "../../components/Button";
+import List from "../../components/List";
+import MiniButton from "../../components/MiniButton";
+import NotAllowed from "../../components/NotAllowed";
+import { DropdownItem } from "../../components/dropdown";
 import MarkdownField from "../../components/form/MarkdownField";
 import SwitchField from "../../components/form/SwitchField";
 import TextField from "../../components/form/TextField";
+import Modal from "../../components/modal";
+import { useModal } from "../../components/modal/useModal";
 import getLang from "../../languages";
 import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
-import MDEditor from "@uiw/react-md-editor";
-import NotAllowed from "../../components/NotAllowed";
-import update from "../../apis/classroom/meeting/update";
-import List from "../../components/List";
-import MiniButton from "../../components/MiniButton";
-import Modal from "../../components/modal";
-import { useModal } from "../../components/modal/useModal";
-import { DropdownItem } from "../../components/dropdown";
 
 const defaultValues: MeetingParams = {
   title: "",
   description: "",
   is_draft: true,
   links: [],
+  files: [],
 };
 
 const linkDefaultValues: LinkType = {
@@ -48,6 +56,7 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
   const [edit, setEdit] = useState(autoEdit);
   const navigate = useNavigate();
   const { control: _composeLink } = useModal({});
+  const _file = useRef<HTMLInputElement>();
 
   const dispatch = useAppDispatch();
   const { classroomId, id } = useParams();
@@ -78,6 +87,15 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
   } = useFieldArray({
     control,
     name: "links",
+  });
+
+  const {
+    append: appendFile,
+    fields: files,
+    remove: removeFile,
+  } = useFieldArray({
+    control,
+    name: "files",
   });
 
   const showFetcher = useFetcher({
@@ -115,7 +133,10 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
       reset({
         ...showFetcher.data,
         links: (showFetcher.data?.links || []).map(
-          ({ id, ...item }: LinkType) => ({ rowId: id, ...item })
+          ({ id, ...item }: LinkType) => ({ ...item, rowId: id })
+        ),
+        files: (showFetcher.data?.files || []).map(
+          ({ id, ...item }: FileType) => ({ ...item, rowId: id })
         ),
       });
     }
@@ -214,7 +235,7 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                           storeFetcher.isLoading || updateFetcher.isLoading
                         }
                         onClick={(e: React.BaseSyntheticEvent) =>
-                          handleSubmit(({ links, ...data }) => {
+                          handleSubmit(({ links, files, ...data }) => {
                             toast.promise(
                               showFetcher.data?.id
                                 ? updateFetcher.process({
@@ -229,8 +250,12 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                                 : storeFetcher.process({
                                     ...data,
                                     links: links?.map((item) => ({
-                                      id: item.rowId,
                                       ...item,
+                                      id: item.rowId,
+                                    })),
+                                    files: files?.map((item) => ({
+                                      ...item,
+                                      id: item.rowId,
                                     })),
                                     classroom_id: classroomId,
                                   }),
@@ -333,6 +358,67 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                   )}
                 </div>
               )}
+              {(showFetcher.data?.files?.length || edit) && (
+                <div className="p-5">
+                  <div className="mb-5 flex justify-between items-center">
+                    <div className="font-bold text-lg">{getLang().file}</div>
+                    {edit && (
+                      <MiniButton
+                        element={"button"}
+                        type="button"
+                        color="dark"
+                        onClick={() => _file.current?.click()}
+                      >
+                        <RiAddCircleFill />
+                      </MiniButton>
+                    )}
+                  </div>
+                  {(edit ? files.length : showFetcher.data?.files?.length) ? (
+                    <div className="flex flex-col justify-start space-y-3 mb-5">
+                      {(
+                        ((edit ? files : showFetcher.data?.files) as
+                          | Array<FileType>
+                          | FieldArrayWithId<MeetingParams, "files", "id">[]) ||
+                        []
+                      ).map((item, index) => (
+                        <List
+                          target="_blank"
+                          key={`${item.id}`}
+                          title={item.file?.name}
+                          subtitle={item.file?.size}
+                          options={
+                            <Fragment>
+                              <DropdownItem
+                                icon={RiDownloadCloud2Line}
+                                element={"a"}
+                                href="/"
+                              >
+                                {getLang().download}
+                              </DropdownItem>
+                              {edit && (
+                                <DropdownItem
+                                  icon={RiDeleteBin2Line}
+                                  element={"button"}
+                                  type="button"
+                                  onClick={() => {
+                                    removeFile(index);
+                                  }}
+                                >
+                                  {getLang().delete}
+                                </DropdownItem>
+                              )}
+                            </Fragment>
+                          }
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-5 text-center rounded border border-gray-300">
+                      {getLang().noDataYet}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -370,6 +456,19 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
           </Button>
         </form>
       </Modal>
+      <input
+        type="file"
+        multiple
+        ref={_file as LegacyRef<HTMLInputElement> | undefined}
+        onChange={(e) => {
+          for (const file of e.target.files || []) {
+            appendFile({
+              file,
+            });
+          }
+        }}
+        className="hidden"
+      />
     </Fragment>
   );
 }

@@ -65,5 +65,7 @@
   "published": "Terbit",
   "meetingDestroyConfirmation": "Anda yakin ingin menghapus pertemuan ini?",
   "link": "Tautan",
-  "url": "URL"
+  "url": "URL",
+  "file": "Berkas",
+  "download": "Unduh"
 }
