@@ -236,29 +236,26 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                         }
                         onClick={(e: React.BaseSyntheticEvent) =>
                           handleSubmit(({ links, files, ...data }) => {
+                            const parseData = {
+                              ...data,
+                              links: links?.map((item) => ({
+                                ...item,
+                                id: item.rowId,
+                              })),
+                              files: files?.map((item) => ({
+                                ...item,
+                                id: item.rowId,
+                              })),
+                              classroom_id: classroomId,
+                            };
+
                             toast.promise(
                               showFetcher.data?.id
                                 ? updateFetcher.process({
-                                    ...data,
-                                    links: links?.map((item) => ({
-                                      ...item,
-                                      id: item.rowId,
-                                    })),
-                                    classroom_id: classroomId,
+                                    ...parseData,
                                     id,
                                   })
-                                : storeFetcher.process({
-                                    ...data,
-                                    links: links?.map((item) => ({
-                                      ...item,
-                                      id: item.rowId,
-                                    })),
-                                    files: files?.map((item) => ({
-                                      ...item,
-                                      id: item.rowId,
-                                    })),
-                                    classroom_id: classroomId,
-                                  }),
+                                : storeFetcher.process(parseData),
                               {
                                 pending: getLang().waitAMinute,
                                 success: getLang().succeed,
