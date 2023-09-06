@@ -217,8 +217,8 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                                 ? updateFetcher.process({
                                     ...data,
                                     links: links?.map((item) => ({
-                                      id: item.rowId,
                                       ...item,
+                                      id: item.rowId,
                                     })),
                                     classroom_id: classroomId,
                                     id,
@@ -334,10 +334,10 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
       </div>
       <Modal control={_composeLink} title={getLang().link}>
         <form
-          onSubmit={submitLink(({ rowId, ...data }) => {
-            rowId
+          onSubmit={submitLink((data) => {
+            data.rowId
               ? updateLink(
-                  fields.findIndex((el) => el.rowId === rowId),
+                  fields.findIndex((el) => el.rowId === data.rowId),
                   data
                 )
               : append(data);
