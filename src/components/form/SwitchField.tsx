@@ -7,6 +7,7 @@ type SwitchFieldProps = {
   value?: boolean;
   message?: string;
   onChange?: (args: boolean) => void;
+  labelClassName?: string;
 };
 
 export default function SwitchField({
@@ -16,11 +17,14 @@ export default function SwitchField({
   message = "",
   onChange = () => {},
   labelPosition = "right",
+  labelClassName,
 }: SwitchFieldProps) {
   return (
     <div className={containerClassName}>
       <div className="flex items-center space-x-2">
-        {label && labelPosition === "left" && <label>{label}</label>}
+        {label && labelPosition === "left" && (
+          <label className={labelClassName}>{label}</label>
+        )}
         <button
           type="button"
           className={
@@ -46,7 +50,9 @@ export default function SwitchField({
             )}
           </div>
         </button>
-        {label && labelPosition === "right" && <label>{label}</label>}
+        {label && labelPosition === "right" && (
+          <label className={labelClassName}>{label}</label>
+        )}
       </div>
       {message && <div className="text-sm text-red-500">{message}</div>}
     </div>

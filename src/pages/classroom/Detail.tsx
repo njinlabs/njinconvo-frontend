@@ -93,10 +93,10 @@ export default function Detail() {
                 element={Link}
                 to="meeting"
                 color="green"
-                className="flex items-center"
+                className="flex items-center justify-center space-x-2"
               >
-                <RiAddBoxLine className="text-base lg:text-sm mr-2" />
-                <span>{getLang().meeting}</span>
+                <RiAddBoxLine className="text-base lg:text-sm" />
+                <span className="hidden lg:block">{getLang().meeting}</span>
               </Button>
             )}
             <Button

@@ -133,10 +133,10 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
   return (
     <Fragment>
       <div className="flex-1 relative">
-        <div className="flex justify-start items-stretch absolute top-0 left-0 w-full h-full">
-          <div className="flex-1 border-r border-gray-300 h-full flex flex-col">
-            <div className="flex-1 border-b border-gray-300 relative">
-              <div className="absolute top-0 left-0 w-full h-full overflow-auto p-5">
+        <div className="block lg:flex justify-start items-stretch absolute top-0 left-0 w-full h-full overflow-auto lg:overflow-hidden">
+          <div className="flex-1 border-r border-gray-300 h-auto lg:h-full flex flex-col">
+            <div className="flex-1 border-b border-gray-300 relative order-2 lg:order-1">
+              <div className="static lg:absolute top-0 left-0 w-full h-full overflow-auto p-5">
                 {edit ? (
                   <Fragment>
                     <TextField
@@ -176,7 +176,7 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
             </div>
             {(showFetcher.data?.classroom?.classroom_role === "teacher" ||
               autoEdit) && (
-              <div className="flex justify-between items-center p-5">
+              <div className="flex justify-between items-center p-5 sticky lg:static top-0 left-0 w-full bg-white border-b border-gray-300 lg:border-b-0 order-1 lg:order-2">
                 {edit ? (
                   <Fragment>
                     <Controller
@@ -187,10 +187,11 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                           value={!value}
                           onChange={(value) => onChange(!value)}
                           label={getLang().publish}
+                          labelClassName="hidden lg:block"
                         />
                       )}
                     />
-                    <div className="flex items-center justify-end space-x-5">
+                    <div className="flex items-center justify-end space-x-3 lg:space-x-5">
                       {!autoEdit && (
                         <Button
                           element={"button"}
@@ -200,7 +201,9 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                           onClick={() => setEdit(false)}
                         >
                           <RiCloseFill />
-                          <span>{getLang().cancel}</span>
+                          <span className="hidden lg:block">
+                            {getLang().cancel}
+                          </span>
                         </Button>
                       )}
                       <Button
@@ -241,7 +244,9 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                         }
                       >
                         <RiSave2Line />
-                        <span>{getLang().save}</span>
+                        <span className="hidden lg:block">
+                          {getLang().save}
+                        </span>
                       </Button>
                     </div>
                   </Fragment>
@@ -260,8 +265,8 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
               </div>
             )}
           </div>
-          <div className="w-1/3 relative">
-            <div className="absolute top-0 left-0 w-full h-full overflow-auto space-border-b">
+          <div className="w-full lg:w-1/3 relative">
+            <div className="static lg:absolute top-0 left-0 w-full h-full overflow-auto space-border-b">
               {(showFetcher.data?.links?.length || edit) && (
                 <div className="p-5">
                   <div className="mb-5 flex justify-between items-center">
