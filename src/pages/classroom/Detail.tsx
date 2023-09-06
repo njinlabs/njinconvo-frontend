@@ -126,7 +126,7 @@ export default function Detail() {
           <NotFound />
         ) : (
           <div className="flex-1 overflow-auto">
-            <div className="grid grid-flow-row grid-cols-3 p-5 gap-5">
+            <div className="grid grid-flow-row grid-cols-1 lg:grid-cols-3 p-5 gap-5">
               {((meetingsFetcher.data?.data as Array<any>) || []).map(
                 (item, index) => (
                   <List
@@ -191,6 +191,7 @@ export default function Detail() {
                         {moment(item.created_at).format("D MMMM YYYY, HH:mm")}
                       </div>
                     }
+                    element={Link}
                     to={`/classroom/${id}/meeting/${item.id}`}
                   />
                 )

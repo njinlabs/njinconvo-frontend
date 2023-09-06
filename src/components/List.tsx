@@ -1,21 +1,24 @@
-import { ReactNode, useRef } from "react";
+import { ComponentProps, ReactNode, useRef } from "react";
 import { RiMore2Fill } from "react-icons/ri";
-import DropdownMenu, { DropdownMenuRefObject } from "./dropdown/DropdownMenu";
 import { Link } from "react-router-dom";
+import DropdownMenu, { DropdownMenuRefObject } from "./dropdown/DropdownMenu";
 
-export default function List({
-  title,
-  subtitle,
-  photo,
-  options,
-  to,
-}: {
+type ListProps<T extends typeof Link | "a"> = {
   title: string | ReactNode;
   subtitle: string | ReactNode;
   photo?: string | null | ReactNode;
   options?: ReactNode;
-  to?: string;
-}) {
+  element?: T;
+};
+
+export default function List<T extends typeof Link | "a">({
+  title,
+  subtitle,
+  photo,
+  options,
+  element: Element = "a" as T,
+  ...props
+}: ListProps<T> & ComponentProps<T>) {
   const _dropdown = useRef<DropdownMenuRefObject>();
 
   return (
@@ -53,8 +56,11 @@ export default function List({
         </div>
       )}
 
-      {to && (
-        <Link to={to} className="absolute top-0 left-0 w-full h-full"></Link>
+      {Element && (
+        <Element
+          {...(props as any)}
+          className="absolute top-0 left-0 w-full h-full"
+        ></Element>
       )}
     </div>
   );

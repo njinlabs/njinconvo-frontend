@@ -54,5 +54,9 @@ button {
 
 .w-md-editor-preview p,
 .w-md-editor-preview {
-  @apply prose max-w-full !important;
+  @apply prose max-w-full font-roboto !important;
+}
+
+.space-border-b > * + * {
+  @apply border-t;
 }

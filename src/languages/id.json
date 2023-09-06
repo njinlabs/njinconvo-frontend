@@ -63,5 +63,7 @@
   "publish": "Terbitkan",
   "draft": "Konsep",
   "published": "Terbit",
-  "meetingDestroyConfirmation": "Anda yakin ingin menghapus pertemuan ini?"
+  "meetingDestroyConfirmation": "Anda yakin ingin menghapus pertemuan ini?",
+  "link": "Tautan",
+  "url": "URL"
 }
