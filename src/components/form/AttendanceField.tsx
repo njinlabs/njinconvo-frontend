@@ -16,8 +16,8 @@ export default function AttendanceField({
         <button
           type="button"
           className={`h-10 px-2 ${
-            status === "present" ? "bg-primary-600 text-white" : ""
-          } text-xs rounded border uppercase`}
+            status === "present" ? "bg-green-600 text-white" : "border"
+          } text-xs rounded uppercase`}
           onClick={() => onChange("present")}
         >
           {getLang().present}
@@ -25,8 +25,8 @@ export default function AttendanceField({
         <button
           type="button"
           className={`h-10 px-2 ${
-            status === "sick" ? "bg-primary-600 text-white" : ""
-          } text-xs rounded border uppercase`}
+            status === "sick" ? "bg-yellow-600 text-white" : "border"
+          } text-xs rounded uppercase`}
           onClick={() => onChange("sick")}
         >
           {getLang().sick}
@@ -34,8 +34,8 @@ export default function AttendanceField({
         <button
           type="button"
           className={`h-10 px-2 ${
-            status === "permission" ? "bg-primary-600 text-white" : ""
-          } text-xs rounded border uppercase`}
+            status === "permission" ? "bg-blue-600 text-white" : "border"
+          } text-xs rounded uppercase`}
           onClick={() => onChange("permission")}
         >
           {getLang().permission}
@@ -43,8 +43,8 @@ export default function AttendanceField({
         <button
           type="button"
           className={`h-10 px-2 ${
-            status === "absent" ? "bg-primary-600 text-white" : ""
-          } text-xs rounded border uppercase`}
+            status === "absent" ? "bg-red-600 text-white" : "border"
+          } text-xs rounded uppercase`}
           onClick={() => onChange("absent")}
         >
           {getLang().absent}

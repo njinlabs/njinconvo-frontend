@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, BaseSyntheticEvent } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useOutletContext } from "react-router-dom";
 import DateTimeField from "../../../components/form/DateTimeFields";
@@ -12,10 +12,12 @@ import AttendanceField from "../../../components/form/AttendanceField";
 import Button from "../../../components/Button";
 import { RiSave2Line } from "react-icons/ri";
 import show from "../../../apis/classroom/meeting/attendance/show";
-import {
+import store, {
   AttendaceDetailType,
   AttendanceParams,
 } from "../../../apis/classroom/meeting/attendance/store";
+import { toast } from "react-toastify";
+import moment from "moment";
 
 const defaultValues: AttendanceParams = {
   allow_self_attendance: false,
@@ -29,7 +31,14 @@ export default function Attendance() {
     classroom: any;
   }>();
   const dispatch = useAppDispatch();
-  const { control, register, watch, reset } = useForm({
+  const {
+    control,
+    register,
+    watch,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues,
   });
 
@@ -46,12 +55,21 @@ export default function Attendance() {
     api: show,
     onSuccess: (data) => {
       reset({
+        allow_self_attendance: data.allow_self_attendance,
+        self_attendance_due: moment(data.self_attendance_due).format(
+          "YYYY-MM-DD HH:mm"
+        ),
+        show_it_to_participants: data.show_it_to_participants,
         details: ((data.details as Array<any>) || []).map((detail) => ({
           user_id: detail.user_id,
           status: detail.status,
         })),
       });
     },
+  });
+
+  const saveFetcher = useFetcher({
+    api: store,
   });
 
   useEffect(() => {
@@ -119,6 +137,28 @@ export default function Attendance() {
               <Button
                 type="button"
                 element={"button"}
+                onClick={(
+                  e: BaseSyntheticEvent<object, any, any> | undefined
+                ) =>
+                  handleSubmit(({ self_attendance_due, ...data }) =>
+                    toast.promise(
+                      saveFetcher.process({
+                        classroomId: classroom.id,
+                        id: meeting.id,
+                        self_attendance_due: moment(self_attendance_due).format(
+                          "YYYY-MM-DD HH:mm:ss"
+                        ),
+                        ...data,
+                      }),
+                      {
+                        pending: getLang().waitAMinute,
+                        error: getLang().failed,
+                        success: getLang().succeed,
+                      }
+                    )
+                  )(e)
+                }
+                disabled={saveFetcher.isLoading}
                 className="flex justify-start items-center space-x-2"
               >
                 <RiSave2Line />
@@ -144,6 +184,7 @@ export default function Attendance() {
                   <DateTimeField
                     containerClassName="mt-5"
                     label={getLang().selfAttendanceDue}
+                    message={errors.self_attendance_due?.message}
                     {...register("self_attendance_due", {
                       required: getLang().requiredMsg,
                     })}
