@@ -8,14 +8,20 @@ const classroomRoute: RouteObject = {
   path: "classroom",
   element: <Classroom />,
   children: [
-    meetingRoute,
     {
-      path: ":id",
-      element: (
-        <Private privateFor={["teacher", "student"]}>
-          <Detail />
-        </Private>
-      ),
+      path: ":classroomId",
+      element: <Classroom />,
+      children: [
+        {
+          path: "",
+          element: (
+            <Private privateFor={["teacher", "student"]}>
+              <Detail />
+            </Private>
+          ),
+        },
+        meetingRoute,
+      ],
     },
   ],
 };

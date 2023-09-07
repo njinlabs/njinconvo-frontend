@@ -11,32 +11,36 @@ import {
   RiCloseFill,
   RiDeleteBin2Line,
   RiDownloadCloud2Line,
+  RiListOrdered2,
+  RiMore2Fill,
   RiPencilLine,
   RiSave2Line,
 } from "react-icons/ri";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
-import show from "../../apis/classroom/meeting/show";
 import store, {
   FileType,
   LinkType,
   MeetingParams,
-} from "../../apis/classroom/meeting/store";
-import update from "../../apis/classroom/meeting/update";
-import Button from "../../components/Button";
-import List from "../../components/List";
-import MiniButton from "../../components/MiniButton";
-import NotAllowed from "../../components/NotAllowed";
-import { DropdownItem } from "../../components/dropdown";
-import MarkdownField from "../../components/form/MarkdownField";
-import SwitchField from "../../components/form/SwitchField";
-import TextField from "../../components/form/TextField";
-import Modal from "../../components/modal";
-import { useModal } from "../../components/modal/useModal";
-import getLang from "../../languages";
-import { useAppDispatch } from "../../redux/hooks";
-import { setWeb } from "../../redux/slices/web";
-import { useFetcher } from "../../utilities/fetcher";
+} from "../../../apis/classroom/meeting/store";
+import update from "../../../apis/classroom/meeting/update";
+import Button from "../../../components/Button";
+import List from "../../../components/List";
+import MiniButton from "../../../components/MiniButton";
+import NotAllowed from "../../../components/NotAllowed";
+import { DropdownItem } from "../../../components/dropdown";
+import DropdownMenu, {
+  DropdownMenuRefObject,
+} from "../../../components/dropdown/DropdownMenu";
+import MarkdownField from "../../../components/form/MarkdownField";
+import SwitchField from "../../../components/form/SwitchField";
+import TextField from "../../../components/form/TextField";
+import Modal from "../../../components/modal";
+import { useModal } from "../../../components/modal/useModal";
+import getLang from "../../../languages";
+import { useAppDispatch } from "../../../redux/hooks";
+import { setWeb } from "../../../redux/slices/web";
+import { useFetcher } from "../../../utilities/fetcher";
 
 const defaultValues: MeetingParams = {
   title: "",
@@ -52,14 +56,20 @@ const linkDefaultValues: LinkType = {
   url: "",
 };
 
-export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
+export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
   const [edit, setEdit] = useState(autoEdit);
   const navigate = useNavigate();
   const { control: _composeLink } = useModal({});
   const _file = useRef<HTMLInputElement>();
+  const _dropdownMore = useRef<DropdownMenuRefObject>();
+  const _dropdownMoreSm = useRef<DropdownMenuRefObject>();
+  const { classroom, meeting, refetchMeeting } = useOutletContext<{
+    classroom: any;
+    meeting: any;
+    refetchMeeting: () => void;
+  }>();
 
   const dispatch = useAppDispatch();
-  const { classroomId, id } = useParams();
   const {
     register,
     control,
@@ -98,15 +108,11 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
     name: "files",
   });
 
-  const showFetcher = useFetcher({
-    api: show,
-  });
-
   const storeFetcher = useFetcher({
     api: store,
     onSuccess: (data) => {
       setEdit(false);
-      navigate(`/classroom/${classroomId}/meeting/${data.id}`, {
+      navigate(`/classroom/${classroom.id}/meeting/${data.id}`, {
         replace: true,
       });
     },
@@ -116,40 +122,33 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
     api: update,
     onSuccess: () => {
       setEdit(false);
-      showFetcher.process({ id: id!, classroomId: classroomId! });
+      refetchMeeting();
     },
   });
 
   useEffect(() => {
     dispatch(
       setWeb({
-        pageTitle: showFetcher.data?.id
-          ? showFetcher.data?.title
-          : getLang().newMeeting,
+        pageTitle: meeting?.id ? meeting?.title : getLang().newMeeting,
       })
     );
 
-    if (showFetcher.data) {
+    if (meeting) {
       reset({
-        ...showFetcher.data,
-        links: (showFetcher.data?.links || []).map(
-          ({ id, ...item }: LinkType) => ({ ...item, rowId: id })
-        ),
-        files: (showFetcher.data?.files || []).map(
-          ({ id, ...item }: FileType) => ({ ...item, rowId: id })
-        ),
+        ...meeting,
+        links: (meeting?.links || []).map(({ id, ...item }: LinkType) => ({
+          ...item,
+          rowId: id,
+        })),
+        files: (meeting?.files || []).map(({ id, ...item }: FileType) => ({
+          ...item,
+          rowId: id,
+        })),
       });
     }
-  }, [showFetcher.data]);
+  }, [meeting]);
 
-  useEffect(() => {
-    if (classroomId && id) {
-      showFetcher.process({ id, classroomId });
-    }
-  }, [classroomId, id]);
-
-  if (!autoEdit && !showFetcher.data && !showFetcher.isLoading)
-    return <NotAllowed />;
+  if (!autoEdit && !meeting) return <NotAllowed />;
 
   return (
     <Fragment>
@@ -185,18 +184,17 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                 ) : (
                   <Fragment>
                     <div className="font-bold text-xl font-montserrat text-gray-700">
-                      {showFetcher.data?.title}
+                      {meeting?.title}
                     </div>
                     <MDEditor.Markdown
-                      source={showFetcher.data?.description}
+                      source={meeting?.description}
                       className="mt-5 !prose !max-w-full !text-gray-600 !font-roboto"
                     />
                   </Fragment>
                 )}
               </div>
             </div>
-            {(showFetcher.data?.classroom?.classroom_role === "teacher" ||
-              autoEdit) && (
+            {(meeting?.classroom?.classroom_role === "teacher" || autoEdit) && (
               <div className="flex justify-between items-center p-5 sticky lg:static top-0 left-0 w-full bg-white border-b border-gray-300 lg:border-b-0 order-1 lg:order-2">
                 {edit ? (
                   <Fragment>
@@ -246,14 +244,14 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                                 ...item,
                                 id: item.rowId,
                               })),
-                              classroom_id: classroomId,
+                              classroom_id: classroom.id,
                             };
 
                             toast.promise(
-                              showFetcher.data?.id
+                              meeting?.id
                                 ? updateFetcher.process({
                                     ...parseData,
-                                    id,
+                                    id: meeting.id,
                                   })
                                 : storeFetcher.process(parseData),
                               {
@@ -273,23 +271,70 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                     </div>
                   </Fragment>
                 ) : (
-                  <Button
-                    element={"button"}
-                    type="button"
-                    color="basic"
-                    className="flex justify-start items-center space-x-2"
-                    onClick={() => setEdit(true)}
-                  >
-                    <RiPencilLine />
-                    <span>{getLang().edit}</span>
-                  </Button>
+                  <Fragment>
+                    <Button
+                      element={"button"}
+                      type="button"
+                      color="basic"
+                      className="flex justify-start items-center space-x-2"
+                      onClick={() => setEdit(true)}
+                    >
+                      <RiPencilLine />
+                      <span>{getLang().edit}</span>
+                    </Button>
+
+                    <div
+                      className="relative"
+                      onBlur={(e) => {
+                        _dropdownMore.current?.onBlur(e);
+                        _dropdownMoreSm.current?.onBlur(e);
+                      }}
+                    >
+                      <Button
+                        element={"button"}
+                        type="button"
+                        color="dark"
+                        className="flex justify-start items-center space-x-2 uppercase"
+                        onClick={() => {
+                          _dropdownMore.current?.toggle();
+                          _dropdownMoreSm.current?.toggle();
+                        }}
+                      >
+                        <RiMore2Fill />
+                        <span>{getLang().option}</span>
+                      </Button>
+                      <DropdownMenu
+                        ref={_dropdownMore}
+                        position="TopRight"
+                        animation="FromBottom"
+                        className="max-lg:hidden"
+                      >
+                        <DropdownItem
+                          element={Link}
+                          to="attendance"
+                          icon={RiListOrdered2}
+                        >
+                          {getLang().attendance}
+                        </DropdownItem>
+                      </DropdownMenu>
+                      <DropdownMenu ref={_dropdownMoreSm} className="lg:hidden">
+                        <DropdownItem
+                          element={Link}
+                          to="attendance"
+                          icon={RiListOrdered2}
+                        >
+                          {getLang().attendance}
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </div>
+                  </Fragment>
                 )}
               </div>
             )}
           </div>
           <div className="w-full lg:w-1/3 relative">
             <div className="static lg:absolute top-0 left-0 w-full h-full overflow-auto space-border-b">
-              {(showFetcher.data?.links?.length || edit) && (
+              {(meeting?.links?.length || edit) && (
                 <div className="p-5">
                   <div className="mb-5 flex justify-between items-center">
                     <div className="font-bold text-lg">{getLang().link}</div>
@@ -304,12 +349,10 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                       </MiniButton>
                     )}
                   </div>
-                  {(edit ? fields.length : showFetcher.data?.links?.length) ? (
+                  {(edit ? fields.length : meeting?.links?.length) ? (
                     <div className="flex flex-col justify-start space-y-3 mb-5">
                       {(
-                        ((edit
-                          ? fields
-                          : showFetcher.data?.links) as Array<any>) || []
+                        ((edit ? fields : meeting?.links) as Array<any>) || []
                       ).map((item, index) => (
                         <List
                           element={"a"}
@@ -355,7 +398,7 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                   )}
                 </div>
               )}
-              {(showFetcher.data?.files?.length || edit) && (
+              {(meeting?.files?.length || edit) && (
                 <div className="p-5">
                   <div className="mb-5 flex justify-between items-center">
                     <div className="font-bold text-lg">{getLang().file}</div>
@@ -370,10 +413,10 @@ export default function Meeting({ autoEdit = true }: { autoEdit?: boolean }) {
                       </MiniButton>
                     )}
                   </div>
-                  {(edit ? files.length : showFetcher.data?.files?.length) ? (
+                  {(edit ? files.length : meeting?.files?.length) ? (
                     <div className="flex flex-col justify-start space-y-3 mb-5">
                       {(
-                        ((edit ? files : showFetcher.data?.files) as
+                        ((edit ? files : meeting?.files) as
                           | Array<FileType>
                           | FieldArrayWithId<MeetingParams, "files", "id">[]) ||
                         []

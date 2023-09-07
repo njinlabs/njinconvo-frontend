@@ -22,6 +22,7 @@ type DropdownMenuProps = {
   children?: ReactNode;
   position?: keyof typeof dropdownMenuPosition;
   animation?: keyof typeof dropdownMenuAnimation;
+  className?: string;
 };
 
 export type DropdownMenuRefObject = {
@@ -42,6 +43,7 @@ const DropdownMenu = forwardRef(
       children,
       position = "BottomRight",
       animation = "FromTop",
+      className = "",
     }: DropdownMenuProps,
     ref
   ) => {
@@ -117,7 +119,7 @@ const DropdownMenu = forwardRef(
           animate
             ? "translate-y-0 opacity-100"
             : dropdownMenuAnimation[animation]
-        }`}
+        } ${className}`}
         style={style}
         onClick={(e) => {
           e.stopPropagation();

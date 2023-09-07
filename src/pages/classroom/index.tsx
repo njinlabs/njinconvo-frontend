@@ -1,19 +1,31 @@
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { Outlet, useParams } from "react-router-dom";
+import show from "../../apis/classroom/show";
+import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
+import { useFetcher } from "../../utilities/fetcher";
 
 export default function Classroom() {
   const dispatch = useAppDispatch();
-  const { data: user } = useAppSelector((state) => state.user);
+  const { classroomId } = useParams();
+
+  const classroomShowFetcher = useFetcher({
+    api: show,
+  });
 
   useEffect(() => {
     dispatch(
       setWeb({
-        active: user?.role === "administrator" ? "classroom" : "dashboard",
+        active: "dashboard",
       })
     );
   }, []);
 
-  return <Outlet />;
+  useEffect(() => {
+    classroomShowFetcher.process({ id: classroomId! });
+  }, [classroomId]);
+
+  if (!classroomShowFetcher.data) return null;
+
+  return <Outlet context={{ classroom: classroomShowFetcher.data }} />;
 }

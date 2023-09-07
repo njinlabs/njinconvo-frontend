@@ -67,5 +67,15 @@
   "link": "Tautan",
   "url": "URL",
   "file": "Berkas",
-  "download": "Unduh"
+  "download": "Unduh",
+  "info": "Info",
+  "attendance": "Absensi",
+  "quiz": "Kuis",
+  "allowSelfAttendance": "Izinkan Absensi Mandiri",
+  "selfAttendanceDue": "Tenggat Waktu",
+  "showItToParticipants": "Perlihatkan ke Peserta",
+  "present": "Hadir",
+  "sick": "Sakit",
+  "permission": "Izin",
+  "absent": "Alpa"
 }

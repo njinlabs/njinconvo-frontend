@@ -1,54 +1,42 @@
+import moment from "moment";
 import { Fragment, useEffect } from "react";
 import {
   RiAddBoxLine,
   RiChat4Line,
   RiDeleteBin2Line,
-  RiMoreFill,
+  RiInformationLine,
+  RiLogoutCircleLine,
   RiPencilFill,
   RiSearch2Line,
   RiUser6Fill,
   RiUserAddLine,
-  RiLogoutCircleLine,
 } from "react-icons/ri";
-import { Link, useParams } from "react-router-dom";
-import show from "../../apis/classroom/show";
+import { Link, useOutletContext } from "react-router-dom";
+import { toast } from "react-toastify";
+import index from "../../apis/classroom/meeting";
+import destroy from "../../apis/classroom/meeting/destroy";
+import participants from "../../apis/classroom/participants";
 import Button from "../../components/Button";
+import List from "../../components/List";
 import MiniButton from "../../components/MiniButton";
 import NotAllowed from "../../components/NotAllowed";
+import NotFound from "../../components/NotFound";
+import { DropdownItem } from "../../components/dropdown";
 import Modal from "../../components/modal";
 import { useModal } from "../../components/modal/useModal";
 import getLang from "../../languages";
-import { useFetcher } from "../../utilities/fetcher";
 import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
-import participants from "../../apis/classroom/participants";
-import List from "../../components/List";
-import index from "../../apis/classroom/meeting";
-import NotFound from "../../components/NotFound";
-import moment from "moment";
-import { DropdownItem } from "../../components/dropdown";
-import { toast } from "react-toastify";
+import { useFetcher } from "../../utilities/fetcher";
 import { warningAlert } from "../../utilities/sweet-alert";
-import destroy from "../../apis/classroom/meeting/destroy";
 
 export default function Detail() {
-  const { id } = useParams();
   const dispatch = useAppDispatch();
   const { control: _infoModal } = useModal({});
+  const { classroom } = useOutletContext<{ classroom: any }>();
 
   const participantsFetcher = useFetcher({
     api: participants,
-  });
-
-  const classroomShowFetcher = useFetcher({
-    api: show,
-    onSuccess: (data) => {
-      dispatch(
-        setWeb({
-          pageTitle: data.name,
-        })
-      );
-    },
   });
 
   const meetingsFetcher = useFetcher({
@@ -58,19 +46,20 @@ export default function Detail() {
   const destroyMeetingFetcher = useFetcher({
     api: destroy,
     onSuccess: () => {
-      meetingsFetcher.process({ classroomId: id! });
+      meetingsFetcher.process({ classroomId: classroom.id! });
     },
   });
 
   useEffect(() => {
-    if (id) {
-      classroomShowFetcher.process({ id: id! });
-      meetingsFetcher.process({ classroomId: id! });
-    }
-  }, [id]);
+    dispatch(
+      setWeb({
+        pageTitle: classroom.name,
+      })
+    );
+    meetingsFetcher.process({ classroomId: classroom.id });
+  }, [classroom]);
 
-  if (!classroomShowFetcher.data && !classroomShowFetcher.isLoading)
-    return <NotAllowed />;
+  if (!classroom) return <NotAllowed />;
 
   return (
     <Fragment>
@@ -87,8 +76,7 @@ export default function Detail() {
             </div>
           </div>
           <div className="flex items-center justify-end ml-auto px-5 space-x-3">
-            {classroomShowFetcher.data?.has_joined?.classroom_role ===
-              "teacher" && (
+            {classroom?.has_joined?.classroom_role === "teacher" && (
               <Button
                 element={Link}
                 to="meeting"
@@ -109,16 +97,13 @@ export default function Detail() {
                   !participantsFetcher.isLoading &&
                   !participantsFetcher.data
                 ) {
-                  participantsFetcher.process({ id: id! });
+                  participantsFetcher.process({ id: classroom.id! });
                 }
                 _infoModal.open();
               }}
             >
-              <RiMoreFill className="text-base lg:text-sm" />
-              {classroomShowFetcher.data?.has_joined?.classroom_role ===
-                "student" && (
-                <span className="ml-2 uppercase">{getLang().option}</span>
-              )}
+              <RiInformationLine className="text-base lg:text-sm" />
+              <span className="ml-2 uppercase">{getLang().info}</span>
             </Button>
           </div>
         </div>
@@ -133,52 +118,52 @@ export default function Detail() {
                     key={`${index}`}
                     title={item.title}
                     options={
-                      <Fragment>
-                        <DropdownItem
-                          element={"button"}
-                          type="button"
-                          icon={RiDeleteBin2Line}
-                          className="text-red-600"
-                          iconClassName="text-red-500"
-                          onClick={() =>
-                            warningAlert({
-                              title: getLang().sure,
-                              text: getLang().meetingDestroyConfirmation,
-                              showCancelButton: true,
-                              cancelButtonText: getLang().cancel,
-                              confirmButtonText: getLang().yesConfirm,
-                            }).then((value) => {
-                              if (value.isConfirmed) {
-                                toast.promise(
-                                  destroyMeetingFetcher.process({
-                                    classroomId: id!,
-                                    id: item.id,
-                                  }),
-                                  {
-                                    pending: getLang().waitAMinute,
-                                    success: getLang().succeed,
-                                    error: getLang().failed,
-                                  }
-                                );
-                              }
-                            })
-                          }
-                        >
-                          {getLang().delete}
-                        </DropdownItem>
-                      </Fragment>
+                      classroom?.has_joined?.classroom_role === "teacher" ? (
+                        <Fragment>
+                          <DropdownItem
+                            element={"button"}
+                            type="button"
+                            icon={RiDeleteBin2Line}
+                            className="text-red-600"
+                            iconClassName="text-red-500"
+                            onClick={() =>
+                              warningAlert({
+                                title: getLang().sure,
+                                text: getLang().meetingDestroyConfirmation,
+                                showCancelButton: true,
+                                cancelButtonText: getLang().cancel,
+                                confirmButtonText: getLang().yesConfirm,
+                              }).then((value) => {
+                                if (value.isConfirmed) {
+                                  toast.promise(
+                                    destroyMeetingFetcher.process({
+                                      classroomId: classroom.id!,
+                                      id: item.id,
+                                    }),
+                                    {
+                                      pending: getLang().waitAMinute,
+                                      success: getLang().succeed,
+                                      error: getLang().failed,
+                                    }
+                                  );
+                                }
+                              })
+                            }
+                          >
+                            {getLang().delete}
+                          </DropdownItem>
+                        </Fragment>
+                      ) : undefined
                     }
                     subtitle={
                       <div
                         className={
-                          classroomShowFetcher.data?.has_joined
-                            ?.classroom_role === "teacher"
+                          classroom?.has_joined?.classroom_role === "teacher"
                             ? "mt-1"
                             : ""
                         }
                       >
-                        {classroomShowFetcher.data?.has_joined
-                          ?.classroom_role === "teacher" &&
+                        {classroom?.has_joined?.classroom_role === "teacher" &&
                           (item.is_draft ? (
                             <span className="uppercase inline-table mr-2 text-xs bg-yellow-300 border border-yellow-400 p-1 rounded">
                               {getLang().draft}
@@ -192,7 +177,7 @@ export default function Detail() {
                       </div>
                     }
                     element={Link}
-                    to={`/classroom/${id}/meeting/${item.id}`}
+                    to={`/classroom/${classroom.id}/meeting/${item.id}`}
                   />
                 )
               )}
@@ -203,9 +188,9 @@ export default function Detail() {
       <Modal control={_infoModal} title={getLang().detail}>
         <div className="flex justify-start items-center space-x-5 mb-6 group-hover:bg-gray-100">
           <div className="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0 rounded-full bg-primary-100 border border-primary-200 flex justify-center items-center overflow-hidden">
-            {classroomShowFetcher.data?.avatar ? (
+            {classroom?.avatar ? (
               <img
-                src={classroomShowFetcher.data?.avatar}
+                src={classroom?.avatar}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -214,12 +199,11 @@ export default function Detail() {
           </div>
           <div className="flex-1 flex flex-col items-start">
             <div className="font-bold text-gray-700 font-montserrat w-full">
-              {classroomShowFetcher.data?.name}
+              {classroom?.name}
             </div>
-            <div>{classroomShowFetcher.data?.code}</div>
+            <div>{classroom?.code}</div>
           </div>
-          {classroomShowFetcher.data?.has_joined?.classroom_role ===
-            "teacher" && (
+          {classroom?.has_joined?.classroom_role === "teacher" && (
             <MiniButton
               element={"button"}
               color="basic"
@@ -249,8 +233,7 @@ export default function Detail() {
             <RiUserAddLine />
             <span>{getLang().invite}</span>
           </Button>
-          {classroomShowFetcher.data?.has_joined?.classroom_role ===
-          "teacher" ? (
+          {classroom?.has_joined?.classroom_role === "teacher" ? (
             <Button
               type="button"
               element={"button"}
