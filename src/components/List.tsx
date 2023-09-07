@@ -30,7 +30,7 @@ export default function List<T extends typeof Link | "a">({
           {photo}
         </div>
       ) : null}
-      <div className={`flex-1 ${photo && "pt-0.5"}`}>
+      <div className={`flex-1 overflow-hidden ${photo && "pt-0.5"}`}>
         <div className="font-bold">{title}</div>
         <div className="text-sm">{subtitle}</div>
       </div>
