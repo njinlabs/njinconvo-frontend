@@ -1,14 +1,14 @@
 import client from "../../client";
 
 export default function index({
-  classroomId,
+  groupId,
   page = 1,
 }: {
   page?: string | number;
-  classroomId: number | string;
+  groupId: number | string;
 }) {
   return client
-    .get(`/classroom/${classroomId}/meeting`, {
+    .get(`/group/${groupId}/meeting`, {
       params: {
         page,
       },

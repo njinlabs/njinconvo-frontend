@@ -292,12 +292,12 @@ export default function User() {
                     label: getLang().administrator,
                   },
                   {
-                    value: "teacher",
-                    label: getLang().teacher,
+                    value: "lead",
+                    label: getLang().lead,
                   },
                   {
-                    value: "student",
-                    label: getLang().student,
+                    value: "participant",
+                    label: getLang().participant,
                   },
                 ]}
               />

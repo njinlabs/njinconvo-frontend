@@ -1,13 +1,13 @@
 import client from "../../client";
 
-export default function show({
+export default function destroy({
+  groupId,
   id,
-  classroomId,
 }: {
+  groupId: string | number;
   id: string | number;
-  classroomId: string | number;
 }) {
   return client
-    .get(`/classroom/${classroomId}/meeting/${id}`)
+    .delete(`/group/${groupId}/meeting/${id}`)
     .then((response) => response.data);
 }

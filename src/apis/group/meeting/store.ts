@@ -23,13 +23,13 @@ export type MeetingParams = {
   title: string;
   description: string;
   is_draft: boolean;
-  classroom_id?: number | string;
+  group_id?: number | string;
   links?: LinkType[];
   files?: FileType[];
 };
 
 export default function store({
-  classroom_id: classroomId,
+  group_id: groupId,
   files,
   links,
   ...data
@@ -55,6 +55,6 @@ export default function store({
   }
 
   return client
-    .post(`/classroom/${classroomId}/meeting`, formData)
+    .post(`/group/${groupId}/meeting`, formData)
     .then((response) => response.data);
 }

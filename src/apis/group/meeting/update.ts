@@ -3,7 +3,7 @@ import { MeetingParams } from "./store";
 
 export default function update({
   id,
-  classroom_id: classroomId,
+  group_id: groupId,
   links,
   files,
   ...data
@@ -36,6 +36,6 @@ export default function update({
   }
 
   return client
-    .put(`/classroom/${classroomId}/meeting/${id}`, formData)
+    .put(`/group/${groupId}/meeting/${id}`, formData)
     .then((response) => response.data);
 }

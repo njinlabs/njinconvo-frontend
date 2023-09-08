@@ -10,11 +10,11 @@ import {
   RiLoginBoxLine,
 } from "react-icons/ri";
 import { toast } from "react-toastify";
-import index from "../../apis/classroom";
-import showByCode from "../../apis/classroom/show-by-code";
-import store from "../../apis/classroom/store";
+import index from "../../apis/group";
+import showByCode from "../../apis/group/show-by-code";
+import store from "../../apis/group/store";
 import Button from "../../components/Button";
-import ClassroomList from "../../components/ClassroomList";
+import GroupList from "../../components/GroupList";
 import NotFound from "../../components/NotFound";
 import TextField from "../../components/form/TextField";
 import Modal from "../../components/modal";
@@ -22,7 +22,7 @@ import { useModal } from "../../components/modal/useModal";
 import getLang from "../../languages";
 import { useAppSelector } from "../../redux/hooks";
 import { useFetcher } from "../../utilities/fetcher";
-import join from "../../apis/classroom/join";
+import join from "../../apis/group/join";
 
 export default function UserDashboard() {
   const { control: _composeModal } = useModal({});
@@ -51,7 +51,7 @@ export default function UserDashboard() {
     },
   });
 
-  const classroomByCodeFetcher = useFetcher({
+  const groupByCodeFetcher = useFetcher({
     api: showByCode,
     onSuccess: () => {
       _joinModal.close();
@@ -59,35 +59,35 @@ export default function UserDashboard() {
     },
   });
 
-  const classroomJoinFetcher = useFetcher({
+  const groupJoinFetcher = useFetcher({
     api: join,
     onSuccess: () => {
       _infoModal.close();
-      classroomFetcher.process({});
+      groupFetcher.process({});
     },
   });
 
-  const classroomStoreFetcher = useFetcher({
+  const groupStoreFetcher = useFetcher({
     api: store,
     onSuccess: () => {
-      classroomFetcher.process({});
+      groupFetcher.process({});
       _composeModal.close();
     },
   });
 
-  const classroomFetcher = useFetcher({
+  const groupFetcher = useFetcher({
     api: index,
   });
 
   useEffect(() => {
-    classroomFetcher.process({});
+    groupFetcher.process({});
   }, []);
 
   useEffect(() => {
     const code = searchParams.get("join");
 
     if (code) {
-      toast.promise(classroomByCodeFetcher.process({ code }), {
+      toast.promise(groupByCodeFetcher.process({ code }), {
         pending: getLang().waitAMinute,
         error: getLang().failed,
       });
@@ -109,7 +109,7 @@ export default function UserDashboard() {
             </div>
           </div>
           <div className="flex items-center justify-end ml-auto px-5 space-x-3">
-            {user?.role === "teacher" ? (
+            {user?.role === "lead" ? (
               <Button
                 element={"button"}
                 type="button"
@@ -120,7 +120,7 @@ export default function UserDashboard() {
                 }}
               >
                 <RiAddBoxLine className="text-base lg:text-sm mr-2" />
-                <span>{getLang().createClassroom}</span>
+                <span>{getLang().createGroup}</span>
               </Button>
             ) : (
               <Button
@@ -138,18 +138,18 @@ export default function UserDashboard() {
             )}
           </div>
         </div>
-        {classroomFetcher.data?.data?.length ? (
+        {groupFetcher.data?.data?.length ? (
           <div className="flex-1 relative">
             <div className="absolute top-0 left-0 w-full h-full overflow-auto">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 p-5">
-                {((classroomFetcher.data?.data as any[]) || []).map(
+                {((groupFetcher.data?.data as any[]) || []).map(
                   (item, index) => (
-                    <ClassroomList
+                    <GroupList
                       id={item.id}
                       name={item.name}
-                      teacher={{
-                        fullname: item.teacher.fullname,
-                        avatar: item.teacher.avatar,
+                      lead={{
+                        fullname: item.lead.fullname,
+                        avatar: item.lead.avatar,
                       }}
                       participants={item.participants}
                       key={`${index}`}
@@ -163,10 +163,10 @@ export default function UserDashboard() {
           <NotFound />
         )}
       </div>
-      <Modal control={_composeModal} title={getLang().createClassroom}>
+      <Modal control={_composeModal} title={getLang().createGroup}>
         <form
           onSubmit={handleSubmit((data) => {
-            toast.promise(classroomStoreFetcher.process(data), {
+            toast.promise(groupStoreFetcher.process(data), {
               pending: getLang().waitAMinute,
               success: getLang().succeed,
               error: getLang().failed,
@@ -186,16 +186,16 @@ export default function UserDashboard() {
             element={"button"}
             type="submit"
             className="w-full"
-            disabled={classroomStoreFetcher.isLoading}
+            disabled={groupStoreFetcher.isLoading}
           >
-            {getLang().createClassroom}
+            {getLang().createGroup}
           </Button>
         </form>
       </Modal>
       <Modal control={_joinModal} title={getLang().join}>
         <form
           onSubmit={joinSubmit(({ code }) => {
-            toast.promise(classroomByCodeFetcher.process({ code }), {
+            toast.promise(groupByCodeFetcher.process({ code }), {
               pending: getLang().waitAMinute,
               error: getLang().failed,
             });
@@ -203,7 +203,7 @@ export default function UserDashboard() {
         >
           <TextField
             type="text"
-            label={getLang().classroomCode}
+            label={getLang().groupCode}
             containerClassName="mb-5"
             message={joinErrors.code?.message}
             {...joinRegister("code", {
@@ -214,7 +214,7 @@ export default function UserDashboard() {
             element={"button"}
             type="submit"
             className="w-full"
-            disabled={classroomByCodeFetcher.isLoading}
+            disabled={groupByCodeFetcher.isLoading}
           >
             {getLang().join}
           </Button>
@@ -223,9 +223,9 @@ export default function UserDashboard() {
       <Modal control={_infoModal} title={getLang().detail}>
         <div className="flex justify-start items-center space-x-5 mb-6 group-hover:bg-gray-100">
           <div className="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0 rounded-full bg-primary-100 border border-primary-200 flex justify-center items-center overflow-hidden">
-            {classroomByCodeFetcher.data?.avatar ? (
+            {groupByCodeFetcher.data?.avatar ? (
               <img
-                src={classroomByCodeFetcher.data?.avatar}
+                src={groupByCodeFetcher.data?.avatar}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -234,15 +234,15 @@ export default function UserDashboard() {
           </div>
           <div className="flex-1 flex flex-col items-start">
             <div className="font-bold text-gray-700 font-montserrat w-full">
-              {classroomByCodeFetcher.data?.name}
+              {groupByCodeFetcher.data?.name}
             </div>
-            <div>{classroomByCodeFetcher.data?.teacher?.fullname}</div>
+            <div>{groupByCodeFetcher.data?.lead?.fullname}</div>
           </div>
         </div>
         <div className="flex justify-start items-center space-x-3 border-b border-gray-300 pb-5 mb-5">
-          {classroomByCodeFetcher.data?.has_joined ? (
+          {groupByCodeFetcher.data?.has_joined ? (
             <Button
-              to={"/classroom/" + classroomByCodeFetcher.data?.id}
+              to={"/group/" + groupByCodeFetcher.data?.id}
               element={Link}
               className="flex justify-start items-center space-x-2"
             >
@@ -255,8 +255,8 @@ export default function UserDashboard() {
               element={"button"}
               onClick={() => {
                 toast.promise(
-                  classroomJoinFetcher.process({
-                    code: classroomByCodeFetcher.data?.code,
+                  groupJoinFetcher.process({
+                    code: groupByCodeFetcher.data?.code,
                   }),
                   {
                     pending: getLang().waitAMinute,
@@ -265,7 +265,7 @@ export default function UserDashboard() {
                   }
                 );
               }}
-              disabled={classroomJoinFetcher.isLoading}
+              disabled={groupJoinFetcher.isLoading}
               className="flex justify-start items-center space-x-2"
             >
               <RiCheckFill />

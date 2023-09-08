@@ -1,13 +1,13 @@
 import client from "../../../client";
 
 export default function show({
-  classroomId,
+  groupId,
   id,
 }: {
-  classroomId: string | number;
+  groupId: string | number;
   id: string | number;
 }) {
   return client
-    .get(`/classroom/${classroomId}/meeting/${id}/attendance`)
+    .get(`/group/${groupId}/meeting/${id}/attendance`)
     .then((response) => response.data);
 }

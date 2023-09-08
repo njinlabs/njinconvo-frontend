@@ -1,5 +1,12 @@
 import MDEditor from "@uiw/react-md-editor";
-import { Fragment, LegacyRef, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  LegacyRef,
+  useEffect,
+  useRef,
+  useState,
+  BaseSyntheticEvent,
+} from "react";
 import {
   Controller,
   FieldArrayWithId,
@@ -22,8 +29,8 @@ import store, {
   FileType,
   LinkType,
   MeetingParams,
-} from "../../../apis/classroom/meeting/store";
-import update from "../../../apis/classroom/meeting/update";
+} from "../../../apis/group/meeting/store";
+import update from "../../../apis/group/meeting/update";
 import Button from "../../../components/Button";
 import List from "../../../components/List";
 import MiniButton from "../../../components/MiniButton";
@@ -41,6 +48,8 @@ import getLang from "../../../languages";
 import { useAppDispatch } from "../../../redux/hooks";
 import { setWeb } from "../../../redux/slices/web";
 import { useFetcher } from "../../../utilities/fetcher";
+import showSelf from "../../../apis/group/meeting/attendance/show-self";
+import saveSelf from "../../../apis/group/meeting/attendance/save-self";
 
 const defaultValues: MeetingParams = {
   title: "",
@@ -60,11 +69,12 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
   const [edit, setEdit] = useState(autoEdit);
   const navigate = useNavigate();
   const { control: _composeLink } = useModal({});
+  const { control: _selfAttendance } = useModal({});
   const _file = useRef<HTMLInputElement>();
   const _dropdownMore = useRef<DropdownMenuRefObject>();
   const _dropdownMoreSm = useRef<DropdownMenuRefObject>();
-  const { classroom, meeting, refetchMeeting } = useOutletContext<{
-    classroom: any;
+  const { group, meeting, refetchMeeting } = useOutletContext<{
+    group: any;
     meeting: any;
     refetchMeeting: () => void;
   }>();
@@ -90,6 +100,16 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
   });
 
   const {
+    control: controlSelfAttendance,
+    handleSubmit: submitSelfAttendance,
+    reset: resetSelfAttendance,
+  } = useForm({
+    defaultValues: {
+      status: "",
+    },
+  });
+
+  const {
     append,
     fields,
     update: updateLink,
@@ -112,7 +132,7 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
     api: store,
     onSuccess: (data) => {
       setEdit(false);
-      navigate(`/classroom/${classroom.id}/meeting/${data.id}`, {
+      navigate(`/group/${group.id}/meeting/${data.id}`, {
         replace: true,
       });
     },
@@ -123,6 +143,22 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
     onSuccess: () => {
       setEdit(false);
       refetchMeeting();
+    },
+  });
+
+  const selfFetcher = useFetcher({
+    api: showSelf,
+    onSuccess: (data) => {
+      resetSelfAttendance({
+        status: data.status,
+      });
+    },
+  });
+
+  const saveSelfFetcher = useFetcher({
+    api: saveSelf,
+    onSuccess: () => {
+      _selfAttendance.close();
     },
   });
 
@@ -145,6 +181,10 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
           rowId: id,
         })),
       });
+
+      if (meeting.attendance?.allow_self_attendance) {
+        selfFetcher.process({ groupId: group.id, id: meeting.id });
+      }
     }
   }, [meeting]);
 
@@ -194,7 +234,7 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
                 )}
               </div>
             </div>
-            {(meeting?.classroom?.classroom_role === "teacher" || autoEdit) && (
+            {(meeting?.group?.group_role === "lead" || autoEdit) && (
               <div className="flex justify-between items-center p-5 sticky lg:static top-0 left-0 w-full bg-white border-b border-gray-300 lg:border-b-0 order-1 lg:order-2">
                 {edit ? (
                   <Fragment>
@@ -244,7 +284,7 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
                                 ...item,
                                 id: item.rowId,
                               })),
-                              classroom_id: classroom.id,
+                              group_id: group.id,
                             };
 
                             toast.promise(
@@ -468,6 +508,7 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
                       color="basic"
                       type="button"
                       className="flex-1"
+                      onClick={() => _selfAttendance.open()}
                     >
                       {getLang().confirmAttendance}
                     </Button>
@@ -535,6 +576,80 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
         }}
         className="hidden"
       />
+      {meeting?.attendance?.allow_self_attendance && (
+        <Modal control={_selfAttendance} title="Konfirmasi Kehadiran">
+          <Controller
+            control={controlSelfAttendance}
+            name="status"
+            rules={{ required: true }}
+            render={({ field: { value, onChange } }) => (
+              <div className="mb-5 grid grid-cols-4 gap-3">
+                <Button
+                  element={"button"}
+                  type="button"
+                  color={value === "present" ? "dark" : "basic"}
+                  onClick={() => onChange("present")}
+                >
+                  {getLang().present}
+                </Button>
+                <Button
+                  element={"button"}
+                  type="button"
+                  color={value === "sick" ? "dark" : "basic"}
+                  onClick={() => onChange("sick")}
+                >
+                  {getLang().sick}
+                </Button>
+                <Button
+                  element={"button"}
+                  type="button"
+                  color={value === "permission" ? "dark" : "basic"}
+                  onClick={() => onChange("permission")}
+                >
+                  {getLang().permission}
+                </Button>
+                <Button
+                  element={"button"}
+                  type="button"
+                  color={value === "absent" ? "dark" : "basic"}
+                  onClick={() => onChange("absent")}
+                >
+                  {getLang().absent}
+                </Button>
+              </div>
+            )}
+          />
+          <Button
+            element={"button"}
+            type="button"
+            className="w-full flex justify-center items-center space-x-3"
+            disabled={saveSelfFetcher.isLoading}
+            onClick={(e: BaseSyntheticEvent<object, any, any>) =>
+              submitSelfAttendance(({ status }) =>
+                toast.promise(
+                  saveSelfFetcher.process({
+                    groupId: group.id,
+                    id: meeting.id,
+                    status: status as
+                      | "present"
+                      | "sick"
+                      | "permission"
+                      | "absent",
+                  }),
+                  {
+                    pending: getLang().waitAMinute,
+                    success: getLang().succeed,
+                    error: getLang().failed,
+                  }
+                )
+              )(e)
+            }
+          >
+            <RiSave2Line />
+            <span>{getLang().save}</span>
+          </Button>
+        </Modal>
+      )}
     </Fragment>
   );
 }

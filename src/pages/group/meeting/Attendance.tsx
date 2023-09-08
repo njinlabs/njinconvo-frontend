@@ -7,15 +7,15 @@ import getLang from "../../../languages";
 import { useAppDispatch } from "../../../redux/hooks";
 import { setWeb } from "../../../redux/slices/web";
 import { useFetcher } from "../../../utilities/fetcher";
-import participants from "../../../apis/classroom/participants";
+import participants from "../../../apis/group/participants";
 import AttendanceField from "../../../components/form/AttendanceField";
 import Button from "../../../components/Button";
 import { RiSave2Line } from "react-icons/ri";
-import show from "../../../apis/classroom/meeting/attendance/show";
+import show from "../../../apis/group/meeting/attendance/show";
 import store, {
   AttendaceDetailType,
   AttendanceParams,
-} from "../../../apis/classroom/meeting/attendance/store";
+} from "../../../apis/group/meeting/attendance/store";
 import { toast } from "react-toastify";
 import moment from "moment";
 import NotAllowed from "../../../components/NotAllowed";
@@ -27,9 +27,9 @@ const defaultValues: AttendanceParams = {
 };
 
 export default function Attendance() {
-  const { meeting, classroom } = useOutletContext<{
+  const { meeting, group } = useOutletContext<{
     meeting: any;
-    classroom: any;
+    group: any;
   }>();
   const dispatch = useAppDispatch();
   const {
@@ -82,19 +82,16 @@ export default function Attendance() {
   }, [meeting]);
 
   useEffect(() => {
-    participantsFetcher.process({ id: classroom.id });
-  }, [classroom]);
+    participantsFetcher.process({ id: group.id });
+  }, [group]);
 
   useEffect(() => {
-    if (classroom.id && meeting.id) {
-      attendanceFetcher.process({ classroomId: classroom.id, id: meeting.id });
+    if (group.id && meeting.id) {
+      attendanceFetcher.process({ groupId: group.id, id: meeting.id });
     }
-  }, [classroom, meeting]);
+  }, [group, meeting]);
 
-  if (
-    classroom.has_joined?.classroom_role === "teacher" ||
-    attendanceFetcher.data
-  )
+  if (group.has_joined?.group_role === "lead" || attendanceFetcher.data)
     return (
       <Fragment>
         <div className="flex-1 relative">
@@ -103,12 +100,12 @@ export default function Attendance() {
               <div className="flex-1 border-b border-gray-300 relative order-2 lg:order-1">
                 <div className="static lg:absolute top-0 left-0 w-full h-full overflow-auto space-border-b">
                   {((participantsFetcher.data as Array<any>) || [])
-                    .filter((item) => item.classroom_role === "student")
+                    .filter((item) => item.group_role === "participant")
                     .map((item, index) => {
                       const findIndex = fields.findIndex(
                         (el) => el.user_id === item.id
                       );
-                      if (classroom.has_joined?.classroom_role === "teacher") {
+                      if (group.has_joined?.group_role === "lead") {
                         if (findIndex < 0)
                           return (
                             <AttendanceField
@@ -132,8 +129,7 @@ export default function Attendance() {
                               <AttendanceField
                                 status={value}
                                 onChange={
-                                  classroom.has_joined?.classroom_role ===
-                                  "teacher"
+                                  group.has_joined?.group_role === "lead"
                                     ? onChange
                                     : () => {}
                                 }
@@ -175,7 +171,7 @@ export default function Attendance() {
                     })}
                 </div>
               </div>
-              {classroom.has_joined?.classroom_role === "teacher" && (
+              {group.has_joined?.group_role === "lead" && (
                 <div className="flex justify-between items-center p-5 sticky lg:static top-0 left-0 w-full bg-white border-b border-gray-300 lg:border-b-0 order-1 lg:order-2">
                   <Button
                     type="button"
@@ -186,7 +182,7 @@ export default function Attendance() {
                       handleSubmit(({ self_attendance_due, ...data }) =>
                         toast.promise(
                           saveFetcher.process({
-                            classroomId: classroom.id,
+                            groupId: group.id,
                             id: meeting.id,
                             self_attendance_due: moment(
                               self_attendance_due
@@ -210,7 +206,7 @@ export default function Attendance() {
                 </div>
               )}
             </div>
-            {classroom.has_joined?.classroom_role === "teacher" && (
+            {group.has_joined?.group_role === "lead" && (
               <div className="w-full lg:w-1/3 relative">
                 <div className="static lg:absolute top-0 left-0 w-full h-full overflow-auto space-border-b">
                   <div className="p-5">

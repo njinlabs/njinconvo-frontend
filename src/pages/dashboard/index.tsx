@@ -17,7 +17,7 @@ export default function Dashboard() {
     );
   }, []);
 
-  if (user?.role === "teacher" || user?.role === "student")
+  if (user?.role === "lead" || user?.role === "participant")
     return <UserDashboard />;
   return null;
 }

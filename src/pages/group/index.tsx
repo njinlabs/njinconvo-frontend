@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
-import show from "../../apis/classroom/show";
+import show from "../../apis/group/show";
 import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 
-export default function Classroom() {
+export default function Group() {
   const dispatch = useAppDispatch();
-  const { classroomId } = useParams();
+  const { groupId } = useParams();
 
-  const classroomShowFetcher = useFetcher({
+  const groupShowFetcher = useFetcher({
     api: show,
   });
 
@@ -22,10 +22,10 @@ export default function Classroom() {
   }, []);
 
   useEffect(() => {
-    classroomShowFetcher.process({ id: classroomId! });
-  }, [classroomId]);
+    groupShowFetcher.process({ id: groupId! });
+  }, [groupId]);
 
-  if (!classroomShowFetcher.data) return null;
+  if (!groupShowFetcher.data) return null;
 
-  return <Outlet context={{ classroom: classroomShowFetcher.data }} />;
+  return <Outlet context={{ group: groupShowFetcher.data }} />;
 }

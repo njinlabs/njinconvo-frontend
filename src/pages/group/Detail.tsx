@@ -13,9 +13,9 @@ import {
 } from "react-icons/ri";
 import { Link, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
-import index from "../../apis/classroom/meeting";
-import destroy from "../../apis/classroom/meeting/destroy";
-import participants from "../../apis/classroom/participants";
+import index from "../../apis/group/meeting";
+import destroy from "../../apis/group/meeting/destroy";
+import participants from "../../apis/group/participants";
 import Button from "../../components/Button";
 import List from "../../components/List";
 import MiniButton from "../../components/MiniButton";
@@ -33,7 +33,7 @@ import { warningAlert } from "../../utilities/sweet-alert";
 export default function Detail() {
   const dispatch = useAppDispatch();
   const { control: _infoModal } = useModal({});
-  const { classroom } = useOutletContext<{ classroom: any }>();
+  const { group } = useOutletContext<{ group: any }>();
 
   const participantsFetcher = useFetcher({
     api: participants,
@@ -46,20 +46,20 @@ export default function Detail() {
   const destroyMeetingFetcher = useFetcher({
     api: destroy,
     onSuccess: () => {
-      meetingsFetcher.process({ classroomId: classroom.id! });
+      meetingsFetcher.process({ groupId: group.id! });
     },
   });
 
   useEffect(() => {
     dispatch(
       setWeb({
-        pageTitle: classroom.name,
+        pageTitle: group.name,
       })
     );
-    meetingsFetcher.process({ classroomId: classroom.id });
-  }, [classroom]);
+    meetingsFetcher.process({ groupId: group.id });
+  }, [group]);
 
-  if (!classroom) return <NotAllowed />;
+  if (!group) return <NotAllowed />;
 
   return (
     <Fragment>
@@ -76,7 +76,7 @@ export default function Detail() {
             </div>
           </div>
           <div className="flex items-center justify-end ml-auto px-5 space-x-3">
-            {classroom?.has_joined?.classroom_role === "teacher" && (
+            {group?.has_joined?.group_role === "lead" && (
               <Button
                 element={Link}
                 to="meeting"
@@ -97,7 +97,7 @@ export default function Detail() {
                   !participantsFetcher.isLoading &&
                   !participantsFetcher.data
                 ) {
-                  participantsFetcher.process({ id: classroom.id! });
+                  participantsFetcher.process({ id: group.id! });
                 }
                 _infoModal.open();
               }}
@@ -118,7 +118,7 @@ export default function Detail() {
                     key={`${index}`}
                     title={item.title}
                     options={
-                      classroom?.has_joined?.classroom_role === "teacher" ? (
+                      group?.has_joined?.group_role === "lead" ? (
                         <Fragment>
                           <DropdownItem
                             element={"button"}
@@ -137,7 +137,7 @@ export default function Detail() {
                                 if (value.isConfirmed) {
                                   toast.promise(
                                     destroyMeetingFetcher.process({
-                                      classroomId: classroom.id!,
+                                      groupId: group.id!,
                                       id: item.id,
                                     }),
                                     {
@@ -158,12 +158,10 @@ export default function Detail() {
                     subtitle={
                       <div
                         className={
-                          classroom?.has_joined?.classroom_role === "teacher"
-                            ? "mt-1"
-                            : ""
+                          group?.has_joined?.group_role === "lead" ? "mt-1" : ""
                         }
                       >
-                        {classroom?.has_joined?.classroom_role === "teacher" &&
+                        {group?.has_joined?.group_role === "lead" &&
                           (item.is_draft ? (
                             <span className="uppercase inline-table mr-2 text-xs bg-yellow-300 border border-yellow-400 p-1 rounded">
                               {getLang().draft}
@@ -177,7 +175,7 @@ export default function Detail() {
                       </div>
                     }
                     element={Link}
-                    to={`/classroom/${classroom.id}/meeting/${item.id}`}
+                    to={`/group/${group.id}/meeting/${item.id}`}
                   />
                 )
               )}
@@ -188,22 +186,19 @@ export default function Detail() {
       <Modal control={_infoModal} title={getLang().detail}>
         <div className="flex justify-start items-center space-x-5 mb-6 group-hover:bg-gray-100">
           <div className="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0 rounded-full bg-primary-100 border border-primary-200 flex justify-center items-center overflow-hidden">
-            {classroom?.avatar ? (
-              <img
-                src={classroom?.avatar}
-                className="w-full h-full object-cover"
-              />
+            {group?.avatar ? (
+              <img src={group?.avatar} className="w-full h-full object-cover" />
             ) : (
               <RiUser6Fill className="text-primary-500 text-xl lg:text-4xl" />
             )}
           </div>
           <div className="flex-1 flex flex-col items-start">
             <div className="font-bold text-gray-700 font-montserrat w-full">
-              {classroom?.name}
+              {group?.name}
             </div>
-            <div>{classroom?.code}</div>
+            <div>{group?.code}</div>
           </div>
-          {classroom?.has_joined?.classroom_role === "teacher" && (
+          {group?.has_joined?.group_role === "lead" && (
             <MiniButton
               element={"button"}
               color="basic"
@@ -233,7 +228,7 @@ export default function Detail() {
             <RiUserAddLine />
             <span>{getLang().invite}</span>
           </Button>
-          {classroom?.has_joined?.classroom_role === "teacher" ? (
+          {group?.has_joined?.group_role === "lead" ? (
             <Button
               type="button"
               element={"button"}
@@ -268,9 +263,7 @@ export default function Detail() {
                   key={`${index}`}
                   title={item.fullname}
                   photo={item.avatar || <RiUser6Fill />}
-                  subtitle={
-                    getLang()[item.classroom_role as keyof typeof getLang]
-                  }
+                  subtitle={getLang()[item.group_role as keyof typeof getLang]}
                 />
               )
             )}

@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
-import Compose from "../pages/classroom/meeting/Compose";
-import Attendance from "../pages/classroom/meeting/Attendance";
-import Meeting from "../pages/classroom/meeting";
+import Compose from "../pages/group/meeting/Compose";
+import Attendance from "../pages/group/meeting/Attendance";
+import Meeting from "../pages/group/meeting";
 
 const meetingRoute: RouteObject = {
   path: "meeting",

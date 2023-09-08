@@ -34,8 +34,8 @@ const menus: {
       name: "dashboard",
     },
     {
-      to: "/classroom",
-      name: "classroom",
+      to: "/group",
+      name: "group",
     },
     {
       to: "/user",
@@ -46,7 +46,7 @@ const menus: {
       name: "setting",
     },
   ],
-  teacher: [
+  lead: [
     {
       to: "/",
       name: "dashboard",
@@ -60,7 +60,7 @@ const menus: {
       name: "chat",
     },
   ],
-  student: [
+  participant: [
     {
       to: "/",
       name: "dashboard",

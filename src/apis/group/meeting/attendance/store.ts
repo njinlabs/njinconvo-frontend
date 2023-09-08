@@ -13,14 +13,14 @@ export type AttendanceParams = {
 };
 
 export default function store({
-  classroomId,
+  groupId,
   id,
   ...data
 }: AttendanceParams & {
-  classroomId: string | number;
+  groupId: string | number;
   id: string | number;
 }) {
   return client
-    .put(`/classroom/${classroomId}/meeting/${id}/attendance`, data)
+    .put(`/group/${groupId}/meeting/${id}/attendance`, data)
     .then((response) => response.data);
 }
