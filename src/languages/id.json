@@ -36,6 +36,7 @@
   "sure": "Yakin?",
   "destroyUser": "Anda akan menghapus pengguna ini",
   "signOutConfirmation": "Anda akan keluar dari akun ini",
+  "leaveConfirmation": "Anda akan keluar dari grup ini",
   "cancel": "Batal",
   "yesConfirm": "Ya, Lanjutkan!",
   "activity": "Aktivitas",
@@ -83,5 +84,6 @@
   "timetable": "Pelaksanaan",
   "startTime": "Waktu Mulai",
   "endTime": "Waktu Selesai",
-  "startNow": "Mulai Sekarang"
+  "startNow": "Mulai Sekarang",
+  "invitationWasCopied": "Undangan Berhasil Disalin"
 }

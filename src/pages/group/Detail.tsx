@@ -11,7 +11,7 @@ import {
   RiUser6Fill,
   RiUserAddLine,
 } from "react-icons/ri";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 import index from "../../apis/group/meeting";
 import destroy from "../../apis/group/meeting/destroy";
@@ -29,11 +29,13 @@ import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import { warningAlert } from "../../utilities/sweet-alert";
+import leave from "../../apis/group/leave";
 
 export default function Detail() {
   const dispatch = useAppDispatch();
   const { control: _infoModal } = useModal({});
   const { group } = useOutletContext<{ group: any }>();
+  const navigate = useNavigate();
 
   const participantsFetcher = useFetcher({
     api: participants,
@@ -49,6 +51,34 @@ export default function Detail() {
       meetingsFetcher.process({ groupId: group.id! });
     },
   });
+
+  const leaveGroupFetcher = useFetcher({
+    api: leave,
+    onSuccess: () => {
+      navigate("/", {
+        replace: true,
+      });
+    },
+  });
+
+  const copyInvitationLink = (code: string) => {
+    const textToCopy = new ClipboardItem({
+      "text/plain": new Blob(
+        [
+          `Ayo bergabung dalam grup meeting saya! \n\n ${
+            import.meta.env.VITE_APP_URL
+          }/?join=${code}`,
+        ],
+        {
+          type: "text/plain",
+        }
+      ),
+    });
+
+    navigator.clipboard.write([textToCopy]).then(function () {
+      toast.success(getLang().invitationWasCopied);
+    });
+  };
 
   useEffect(() => {
     dispatch(
@@ -223,6 +253,7 @@ export default function Detail() {
             type="button"
             element={"button"}
             color="basic"
+            onClick={() => copyInvitationLink(group.code)}
             className="flex justify-start items-center space-x-2"
           >
             <RiUserAddLine />
@@ -244,6 +275,23 @@ export default function Detail() {
               element={"button"}
               color="red"
               className="flex justify-start items-center space-x-2"
+              onClick={() =>
+                warningAlert({
+                  title: getLang().sure,
+                  text: getLang().leaveConfirmation,
+                  showCancelButton: true,
+                  cancelButtonText: getLang().cancel,
+                  confirmButtonText: getLang().yesConfirm,
+                }).then((value) => {
+                  if (value.isConfirmed) {
+                    toast.promise(leaveGroupFetcher.process({ id: group.id }), {
+                      pending: getLang().waitAMinute,
+                      success: getLang().succeed,
+                      error: getLang().failed,
+                    });
+                  }
+                })
+              }
             >
               <RiLogoutCircleLine />
               <span>{getLang().leave}</span>

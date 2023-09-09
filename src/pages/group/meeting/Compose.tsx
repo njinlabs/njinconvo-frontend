@@ -602,33 +602,6 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
                   )}
                 </div>
               )}
-              {(meeting?.attendance?.allow_self_attendance ||
-                meeting?.attendance?.show_it_to_participants) && (
-                <div className="p-5 flex items-center justify-start space-x-5">
-                  {meeting?.attendance?.allow_self_attendance && (
-                    <Button
-                      element={"button"}
-                      color="basic"
-                      type="button"
-                      className="flex-1"
-                      onClick={() => _selfAttendance.open()}
-                    >
-                      {getLang().confirmAttendance}
-                    </Button>
-                  )}
-                  {meeting?.attendance?.show_it_to_participants && (
-                    <Button
-                      element={Link}
-                      color="basic"
-                      type="button"
-                      className="flex-1 flex justify-center items-center text-center"
-                      to="attendance"
-                    >
-                      {getLang().showAttendance}
-                    </Button>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </div>
