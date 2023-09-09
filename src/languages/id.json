@@ -37,6 +37,7 @@
   "destroyUser": "Anda akan menghapus pengguna ini",
   "signOutConfirmation": "Anda akan keluar dari akun ini",
   "leaveConfirmation": "Anda akan keluar dari grup ini",
+  "groupDestroyConfirmation": "Anda akan mengahapus grup ini",
   "cancel": "Batal",
   "yesConfirm": "Ya, Lanjutkan!",
   "activity": "Aktivitas",

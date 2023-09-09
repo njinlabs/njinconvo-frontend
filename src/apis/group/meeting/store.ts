@@ -10,6 +10,7 @@ export type LinkType = {
 export type FileObject = {
   name: string;
   size: number;
+  url?: string;
 };
 
 export type FileType = {

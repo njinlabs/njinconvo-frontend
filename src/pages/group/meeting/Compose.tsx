@@ -29,6 +29,7 @@ import store, {
   FileType,
   LinkType,
   MeetingParams,
+  FileObject,
 } from "../../../apis/group/meeting/store";
 import update from "../../../apis/group/meeting/update";
 import Button from "../../../components/Button";
@@ -52,6 +53,7 @@ import showSelf from "../../../apis/group/meeting/attendance/show-self";
 import saveSelf from "../../../apis/group/meeting/attendance/save-self";
 import DateTimeField from "../../../components/form/DateTimeFields";
 import moment from "moment";
+import getUrl from "../../../utilities/get-url";
 
 const defaultValues: MeetingParams = {
   title: "",
@@ -571,13 +573,16 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
                           subtitle={item.file?.size}
                           options={
                             <Fragment>
-                              <DropdownItem
-                                icon={RiDownloadCloud2Line}
-                                element={"a"}
-                                href="/"
-                              >
-                                {getLang().download}
-                              </DropdownItem>
+                              {(item.file as FileObject).url && (
+                                <DropdownItem
+                                  icon={RiDownloadCloud2Line}
+                                  element={"a"}
+                                  target="_blank"
+                                  href={getUrl((item.file as FileObject).url!)}
+                                >
+                                  {getLang().download}
+                                </DropdownItem>
+                              )}
                               {edit && (
                                 <DropdownItem
                                   icon={RiDeleteBin2Line}

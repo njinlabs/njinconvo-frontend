@@ -4,6 +4,7 @@ import show from "../../apis/group/show";
 import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
+import NotFound from "../../components/NotFound";
 
 export default function Group() {
   const dispatch = useAppDispatch();
@@ -25,7 +26,7 @@ export default function Group() {
     groupShowFetcher.process({ id: groupId! });
   }, [groupId]);
 
-  if (!groupShowFetcher.data) return null;
+  if (!groupShowFetcher.data) return <NotFound />;
 
   return <Outlet context={{ group: groupShowFetcher.data }} />;
 }

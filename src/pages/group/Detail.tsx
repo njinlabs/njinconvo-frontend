@@ -30,6 +30,7 @@ import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import { warningAlert } from "../../utilities/sweet-alert";
 import leave from "../../apis/group/leave";
+import { default as destroyGroup } from "../../apis/group/destroy";
 
 export default function Detail() {
   const dispatch = useAppDispatch();
@@ -54,6 +55,15 @@ export default function Detail() {
 
   const leaveGroupFetcher = useFetcher({
     api: leave,
+    onSuccess: () => {
+      navigate("/", {
+        replace: true,
+      });
+    },
+  });
+
+  const destroyGroupFetcher = useFetcher({
+    api: destroyGroup,
     onSuccess: () => {
       navigate("/", {
         replace: true,
@@ -265,6 +275,26 @@ export default function Detail() {
               element={"button"}
               color="red"
               className="flex justify-start items-center space-x-2"
+              onClick={() =>
+                warningAlert({
+                  title: getLang().sure,
+                  text: getLang().groupDestroyConfirmation,
+                  showCancelButton: true,
+                  cancelButtonText: getLang().cancel,
+                  confirmButtonText: getLang().yesConfirm,
+                }).then((value) => {
+                  if (value.isConfirmed) {
+                    toast.promise(
+                      destroyGroupFetcher.process({ id: group.id }),
+                      {
+                        pending: getLang().waitAMinute,
+                        success: getLang().succeed,
+                        error: getLang().failed,
+                      }
+                    );
+                  }
+                })
+              }
             >
               <RiDeleteBin2Line />
               <span>{getLang().delete}</span>
