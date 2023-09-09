@@ -79,5 +79,9 @@
   "permission": "Izin",
   "absent": "Alpa",
   "confirmAttendance": "Konfirmasi Kehadiran",
-  "showAttendance": "Lihat Kehadiran"
+  "showAttendance": "Lihat Kehadiran",
+  "timetable": "Pelaksanaan",
+  "startTime": "Waktu Mulai",
+  "endTime": "Waktu Selesai",
+  "startNow": "Mulai Sekarang"
 }

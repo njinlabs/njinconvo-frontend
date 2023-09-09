@@ -10,7 +10,9 @@ export default function update({
 }: MeetingParams) {
   const formData = new FormData();
   for (const key in data) {
-    formData.append(key, `${data[key as keyof typeof data]!}`);
+    if (typeof data[key as keyof typeof data] !== "undefined") {
+      formData.append(key, `${data[key as keyof typeof data]}`);
+    }
   }
 
   let i = 0;

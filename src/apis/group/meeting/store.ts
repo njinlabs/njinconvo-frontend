@@ -24,6 +24,8 @@ export type MeetingParams = {
   description: string;
   is_draft: boolean;
   group_id?: number | string;
+  started_at?: string | null;
+  finished_at: string | null;
   links?: LinkType[];
   files?: FileType[];
 };

@@ -50,11 +50,15 @@ import { setWeb } from "../../../redux/slices/web";
 import { useFetcher } from "../../../utilities/fetcher";
 import showSelf from "../../../apis/group/meeting/attendance/show-self";
 import saveSelf from "../../../apis/group/meeting/attendance/save-self";
+import DateTimeField from "../../../components/form/DateTimeFields";
+import moment from "moment";
 
 const defaultValues: MeetingParams = {
   title: "",
   description: "",
   is_draft: true,
+  started_at: null,
+  finished_at: null,
   links: [],
   files: [],
 };
@@ -86,6 +90,7 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
     formState: { errors },
     handleSubmit,
     reset,
+    watch,
   } = useForm({
     defaultValues,
   });
@@ -172,6 +177,8 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
     if (meeting) {
       reset({
         ...meeting,
+        started_at: moment(meeting.started_at).format("YYYY-MM-DD HH:mm"),
+        finished_at: moment(meeting.finished_at).format("YYYY-MM-DD HH:mm"),
         links: (meeting?.links || []).map(({ id, ...item }: LinkType) => ({
           ...item,
           rowId: id,
@@ -273,34 +280,50 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
                           storeFetcher.isLoading || updateFetcher.isLoading
                         }
                         onClick={(e: React.BaseSyntheticEvent) =>
-                          handleSubmit(({ links, files, ...data }) => {
-                            const parseData = {
-                              ...data,
-                              links: links?.map((item) => ({
-                                ...item,
-                                id: item.rowId,
-                              })),
-                              files: files?.map((item) => ({
-                                ...item,
-                                id: item.rowId,
-                              })),
-                              group_id: group.id,
-                            };
+                          handleSubmit(
+                            ({
+                              links,
+                              files,
+                              started_at,
+                              finished_at,
+                              ...data
+                            }) => {
+                              const parseData = {
+                                ...data,
+                                started_at: started_at
+                                  ? moment(started_at).format(
+                                      "YYYY-MM-DD HH:mm:ss"
+                                    )
+                                  : undefined,
+                                finished_at: moment(finished_at).format(
+                                  "YYYY-MM-DD HH:mm:ss"
+                                ),
+                                links: links?.map((item) => ({
+                                  ...item,
+                                  id: item.rowId,
+                                })),
+                                files: files?.map((item) => ({
+                                  ...item,
+                                  id: item.rowId,
+                                })),
+                                group_id: group.id,
+                              };
 
-                            toast.promise(
-                              meeting?.id
-                                ? updateFetcher.process({
-                                    ...parseData,
-                                    id: meeting.id,
-                                  })
-                                : storeFetcher.process(parseData),
-                              {
-                                pending: getLang().waitAMinute,
-                                success: getLang().succeed,
-                                error: getLang().failed,
-                              }
-                            );
-                          })(e)
+                              toast.promise(
+                                meeting?.id
+                                  ? updateFetcher.process({
+                                      ...parseData,
+                                      id: meeting.id,
+                                    })
+                                  : storeFetcher.process(parseData),
+                                {
+                                  pending: getLang().waitAMinute,
+                                  success: getLang().succeed,
+                                  error: getLang().failed,
+                                }
+                              );
+                            }
+                          )(e)
                         }
                       >
                         <RiSave2Line />
@@ -374,6 +397,86 @@ export default function Compose({ autoEdit = true }: { autoEdit?: boolean }) {
           </div>
           <div className="w-full lg:w-1/3 relative">
             <div className="static lg:absolute top-0 left-0 w-full h-full overflow-auto space-border-b">
+              <div className="p-5">
+                <div className="font-bold text-lg">{getLang().timetable}</div>
+                {edit ? (
+                  <Fragment>
+                    <DateTimeField
+                      containerClassName="mt-5"
+                      label={getLang().startTime}
+                      disabled={typeof watch("started_at") !== "string"}
+                      message={errors.started_at?.message}
+                      {...register("started_at")}
+                    />
+                    <Controller
+                      control={control}
+                      name="started_at"
+                      render={({ field: { value, onChange } }) => (
+                        <SwitchField
+                          containerClassName="mt-2"
+                          label={getLang().startNow}
+                          value={typeof value !== "string"}
+                          onChange={(value) => onChange(value ? null : "")}
+                        />
+                      )}
+                    />
+                    <DateTimeField
+                      containerClassName="mt-8"
+                      label={getLang().endTime}
+                      message={errors.finished_at?.message}
+                      {...register("finished_at", {
+                        required: getLang().requiredMsg,
+                      })}
+                    />
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <div className="rounded border border-gray-300 p-3 mt-5">
+                      <div className="text-sm">{getLang().startTime}</div>
+                      <div className="font-bold mt-2">
+                        {moment(meeting.started_at).format(
+                          "DD MMM YYYY, HH:mm"
+                        )}
+                      </div>
+                    </div>
+                    <div className="rounded border border-gray-300 p-3 mt-5">
+                      <div className="text-sm">{getLang().endTime}</div>
+                      <div className="font-bold mt-2">
+                        {moment(meeting.finished_at).format(
+                          "DD MMM YYYY, HH:mm"
+                        )}
+                      </div>
+                    </div>
+                  </Fragment>
+                )}
+              </div>
+              {(meeting?.attendance?.allow_self_attendance ||
+                meeting?.attendance?.show_it_to_participants) && (
+                <div className="p-5 flex items-center justify-start space-x-5">
+                  {meeting?.attendance?.allow_self_attendance && (
+                    <Button
+                      element={"button"}
+                      color="basic"
+                      type="button"
+                      className="flex-1"
+                      onClick={() => _selfAttendance.open()}
+                    >
+                      {getLang().confirmAttendance}
+                    </Button>
+                  )}
+                  {meeting?.attendance?.show_it_to_participants && (
+                    <Button
+                      element={Link}
+                      color="basic"
+                      type="button"
+                      className="flex-1 flex justify-center items-center text-center"
+                      to="attendance"
+                    >
+                      {getLang().showAttendance}
+                    </Button>
+                  )}
+                </div>
+              )}
               {(meeting?.links?.length || edit) && (
                 <div className="p-5">
                   <div className="mb-5 flex justify-between items-center">
