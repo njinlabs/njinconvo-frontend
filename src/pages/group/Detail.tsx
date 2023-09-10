@@ -2,7 +2,6 @@ import moment from "moment";
 import { Fragment, useEffect } from "react";
 import {
   RiAddBoxLine,
-  RiChat4Line,
   RiDeleteBin2Line,
   RiInformationLine,
   RiLogoutCircleLine,
@@ -13,6 +12,8 @@ import {
 } from "react-icons/ri";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
+import { default as destroyGroup } from "../../apis/group/destroy";
+import leave from "../../apis/group/leave";
 import index from "../../apis/group/meeting";
 import destroy from "../../apis/group/meeting/destroy";
 import participants from "../../apis/group/participants";
@@ -29,8 +30,6 @@ import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import { warningAlert } from "../../utilities/sweet-alert";
-import leave from "../../apis/group/leave";
-import { default as destroyGroup } from "../../apis/group/destroy";
 
 export default function Detail() {
   const dispatch = useAppDispatch();
@@ -75,7 +74,7 @@ export default function Detail() {
     const textToCopy = new ClipboardItem({
       "text/plain": new Blob(
         [
-          `Ayo bergabung dalam grup meeting saya! \n\n ${
+          `${getLang().invitationText} \n\n ${
             import.meta.env.VITE_APP_URL
           }/?join=${code}`,
         ],
@@ -250,25 +249,20 @@ export default function Detail() {
           )}
         </div>
         <div className="flex justify-start items-center space-x-3 border-b border-gray-300 pb-5 mb-5">
-          <Button
-            type="button"
-            element={"button"}
-            color="basic"
-            className="flex justify-start items-center space-x-2"
-          >
-            <RiChat4Line />
-            <span>{getLang().chat}</span>
-          </Button>
-          <Button
-            type="button"
-            element={"button"}
-            color="basic"
-            onClick={() => copyInvitationLink(group.code)}
-            className="flex justify-start items-center space-x-2"
-          >
-            <RiUserAddLine />
-            <span>{getLang().invite}</span>
-          </Button>
+          {group?.has_joined?.group_role === "lead" && (
+            <Fragment>
+              <Button
+                type="button"
+                element={"button"}
+                color="basic"
+                onClick={() => copyInvitationLink(group.code)}
+                className="flex justify-start items-center space-x-2"
+              >
+                <RiUserAddLine />
+                <span>{getLang().invite}</span>
+              </Button>
+            </Fragment>
+          )}
           {group?.has_joined?.group_role === "lead" ? (
             <Button
               type="button"

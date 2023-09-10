@@ -86,5 +86,6 @@
   "startTime": "Waktu Mulai",
   "endTime": "Waktu Selesai",
   "startNow": "Mulai Sekarang",
-  "invitationWasCopied": "Undangan Berhasil Disalin"
+  "invitationWasCopied": "Undangan Berhasil Disalin",
+  "invitationText": "Ayo bergabung dalam grup meeting saya!"
 }
