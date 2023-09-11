@@ -28,5 +28,13 @@ export default function Group() {
 
   if (!groupShowFetcher.data) return <NotFound />;
 
-  return <Outlet context={{ group: groupShowFetcher.data }} />;
+  return (
+    <Outlet
+      context={{
+        group: groupShowFetcher.data,
+        refetchGroup: () =>
+          groupShowFetcher.withoutReset().process({ id: groupId! }),
+      }}
+    />
+  );
 }

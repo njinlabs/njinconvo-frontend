@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type FetcherParams<T, P> = {
   api: ({ ...props }: T) => Promise<P | null>;
@@ -17,10 +17,21 @@ export const useFetcher = <T, P>({
 }: FetcherParams<T, P>) => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(initial);
+  const _reset = useRef<boolean>(true);
+
+  const withoutReset = () => {
+    _reset.current = false;
+
+    return {
+      process,
+    };
+  };
 
   const process = (...props: Parameters<typeof api>): Promise<void> =>
     new Promise(async (resolve, reject) => {
-      setData(null);
+      if (_reset.current) {
+        setData(null);
+      }
       setIsLoading(true);
       try {
         const data = await api(...props);
@@ -40,6 +51,7 @@ export const useFetcher = <T, P>({
 
   return {
     data,
+    withoutReset,
     process,
     isLoading,
   };

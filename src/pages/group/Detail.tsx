@@ -1,5 +1,6 @@
 import moment from "moment";
 import { Fragment, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import {
   RiAddBoxLine,
   RiDeleteBin2Line,
@@ -17,12 +18,14 @@ import leave from "../../apis/group/leave";
 import index from "../../apis/group/meeting";
 import destroy from "../../apis/group/meeting/destroy";
 import participants from "../../apis/group/participants";
+import update from "../../apis/group/update";
 import Button from "../../components/Button";
 import List from "../../components/List";
 import MiniButton from "../../components/MiniButton";
 import NotAllowed from "../../components/NotAllowed";
 import NotFound from "../../components/NotFound";
 import { DropdownItem } from "../../components/dropdown";
+import TextField from "../../components/form/TextField";
 import Modal from "../../components/modal";
 import { useModal } from "../../components/modal/useModal";
 import getLang from "../../languages";
@@ -34,8 +37,23 @@ import { warningAlert } from "../../utilities/sweet-alert";
 export default function Detail() {
   const dispatch = useAppDispatch();
   const { control: _infoModal } = useModal({});
-  const { group } = useOutletContext<{ group: any }>();
+  const { control: _editModal } = useModal({});
+  const { group, refetchGroup } = useOutletContext<{
+    group: any;
+    refetchGroup: () => void;
+  }>();
   const navigate = useNavigate();
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      name: "",
+    },
+  });
 
   const participantsFetcher = useFetcher({
     api: participants,
@@ -49,6 +67,14 @@ export default function Detail() {
     api: destroy,
     onSuccess: () => {
       meetingsFetcher.process({ groupId: group.id! });
+    },
+  });
+
+  const updateGroupFetcher = useFetcher({
+    api: update,
+    onSuccess: () => {
+      _editModal.close();
+      refetchGroup();
     },
   });
 
@@ -95,6 +121,10 @@ export default function Detail() {
         pageTitle: group.name,
       })
     );
+
+    reset({
+      name: group?.name,
+    });
     meetingsFetcher.process({ groupId: group.id });
   }, [group]);
 
@@ -243,6 +273,7 @@ export default function Detail() {
               color="basic"
               type="button"
               className="py-2"
+              onClick={() => _editModal.open()}
             >
               <RiPencilFill />
             </MiniButton>
@@ -341,6 +372,38 @@ export default function Detail() {
             )}
           </div>
         )}
+      </Modal>
+      <Modal control={_editModal} title={getLang().editGroup}>
+        <form
+          onSubmit={handleSubmit((data) => {
+            toast.promise(
+              updateGroupFetcher.process({ id: group.id, ...data }),
+              {
+                pending: getLang().waitAMinute,
+                success: getLang().succeed,
+                error: getLang().failed,
+              }
+            );
+          })}
+        >
+          <TextField
+            type="text"
+            label={getLang().name}
+            containerClassName="mb-5"
+            message={errors.name?.message}
+            {...register("name", {
+              required: getLang().requiredMsg,
+            })}
+          />
+          <Button
+            element={"button"}
+            type="submit"
+            className="w-full"
+            disabled={updateGroupFetcher.isLoading}
+          >
+            {getLang().editGroup}
+          </Button>
+        </form>
       </Modal>
     </Fragment>
   );
