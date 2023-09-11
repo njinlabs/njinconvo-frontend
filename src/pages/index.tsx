@@ -1,27 +1,45 @@
-import { useEffect, useRef, useState, ComponentProps, Fragment } from "react";
+import moment from "moment";
+import {
+  ComponentProps,
+  Fragment,
+  LegacyRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useCookies } from "react-cookie";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { Controller, useForm } from "react-hook-form";
 import { CgChevronDown } from "react-icons/cg";
+import {
+  RiCameraFill,
+  RiCloseFill,
+  RiLogoutCircleLine,
+  RiMenu2Fill,
+  RiUser6Fill,
+  RiUserSettingsLine,
+} from "react-icons/ri";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import checkToken from "../apis/auth/check-token";
+import signOut from "../apis/auth/sign/sign-out";
+import client from "../apis/client";
+import Button from "../components/Button";
+import NavbarList from "../components/NavbarList";
 import { DropdownItem, DropdownMenu } from "../components/dropdown";
 import { DropdownMenuRefObject } from "../components/dropdown/DropdownMenu";
-import {
-  RiLogoutCircleLine,
-  RiUser6Fill,
-  RiMenu2Fill,
-  RiCloseFill,
-} from "react-icons/ri";
-import { useFetcher } from "../utilities/fetcher";
-import signOut from "../apis/auth/sign/sign-out";
+import DateField from "../components/form/DateField";
+import TextField from "../components/form/TextField";
+import { BasicSelectField } from "../components/form/select-field";
+import Modal from "../components/modal";
+import { useModal } from "../components/modal/useModal";
 import getLang from "../languages";
-import { toast } from "react-toastify";
-import client from "../apis/client";
-import checkToken from "../apis/auth/check-token";
-import NavbarList from "../components/NavbarList";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { clearUser, setUser } from "../redux/slices/user";
-import { useLocation } from "react-router-dom";
+import { UserData, clearUser, setUser } from "../redux/slices/user";
+import { useFetcher } from "../utilities/fetcher";
 import { warningAlert } from "../utilities/sweet-alert";
-import { Helmet } from "react-helmet-async";
+import getUrl from "../utilities/get-url";
+import updateProfile from "../apis/user/update-profile";
 
 const menus: {
   [key: string]: (Partial<ComponentProps<typeof NavbarList>> & {
@@ -48,6 +66,12 @@ const menus: {
   ],
 };
 
+const defaultProfile: Partial<UserData> = {
+  fullname: "",
+  gender: "",
+  birthday: "",
+};
+
 export default function Layout() {
   const cookie = useCookies(["token"]);
   const cookies = cookie[0];
@@ -60,6 +84,18 @@ export default function Layout() {
   const { data: user } = useAppSelector((state) => state.user);
   const { pathname } = useLocation();
   const [menuShown, setMenuShown] = useState(false);
+  const { control: _editProfile } = useModal({});
+  const _avatar = useRef<HTMLInputElement>();
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: defaultProfile,
+  });
 
   const logoutFetcher = useFetcher({
     api: signOut,
@@ -68,6 +104,14 @@ export default function Layout() {
       removeCookies("token", {
         path: "/",
       });
+    },
+  });
+
+  const updateProfileFetcher = useFetcher({
+    api: updateProfile,
+    onSuccess: (data) => {
+      dispatch(setUser(data));
+      _editProfile.close();
     },
   });
 
@@ -103,6 +147,12 @@ export default function Layout() {
       checkTokenFetcher.process({});
     }
   }, [cookies]);
+
+  useEffect(() => {
+    if (user) {
+      reset({ ...user, birthday: moment(user.birthday).format("YYYY-MM-DD") });
+    }
+  }, [user]);
 
   if (!mount || !cookies.token || !user) return null;
 
@@ -156,9 +206,9 @@ export default function Layout() {
               className="relative flex items-center justify-end space-x-5 p-3 px-5 rounded"
             >
               <div className="w-10 h-10 lg:w-12 lg:h-12 flex-shrink-0 rounded-full bg-white relative overflow-hidden flex justify-center items-center">
-                {user?.avatar && typeof user.avatar === "string" ? (
+                {user?.avatar && !(user.avatar instanceof File) ? (
                   <img
-                    src={user.avatar}
+                    src={getUrl(user.avatar.url!)}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -182,6 +232,13 @@ export default function Layout() {
                 onClick={() => _dropdown.current?.toggle()}
               ></button>
               <DropdownMenu ref={_dropdown}>
+                <DropdownItem
+                  element={"button"}
+                  icon={RiUserSettingsLine}
+                  onClick={() => _editProfile.open()}
+                >
+                  {getLang().editProfile}
+                </DropdownItem>
                 <DropdownItem
                   onClick={() => {
                     warningAlert({
@@ -213,6 +270,97 @@ export default function Layout() {
           <Outlet />
         </div>
       </div>
+      <Modal control={_editProfile} title={getLang().editProfile}>
+        <form
+          onSubmit={handleSubmit((data) => {
+            toast.promise(updateProfileFetcher.process(data), {
+              pending: getLang().waitAMinute,
+              success: getLang().succeed,
+              error: getLang().failed,
+            });
+          })}
+        >
+          <Controller
+            control={control}
+            name="avatar"
+            render={({ field: { value, onChange } }) => (
+              <div className="flex justify-center mb-5">
+                <div className="relative">
+                  <div className="w-28 h-28 lg:w-32 lg:h-32 flex-shrink-0 rounded-full bg-white relative overflow-hidden flex justify-center items-center border border-gray-300">
+                    {value ? (
+                      <img
+                        src={
+                          value instanceof File
+                            ? URL.createObjectURL(value)
+                            : getUrl(value.url!)
+                        }
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <RiUser6Fill className="text-2xl lg:text-4xl text-primary-500" />
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) =>
+                      e.target.files?.length && onChange(e.target.files[0])
+                    }
+                    ref={_avatar as LegacyRef<HTMLInputElement> | undefined}
+                  />
+                  <button
+                    type="button"
+                    className="w-10 h-10 rounded-full bg-gray-100 border border-gray-300 absolute bottom-0 right-0 text-primary-500 flex justify-center items-center hover:bg-gray-200"
+                    onClick={() => _avatar.current?.click()}
+                  >
+                    <RiCameraFill />
+                  </button>
+                </div>
+              </div>
+            )}
+          />
+          <TextField
+            type="text"
+            label={getLang().fullname}
+            containerClassName="mb-5"
+            message={errors.fullname?.message}
+            {...register("fullname", { required: getLang().requiredMsg })}
+          />
+          <Controller
+            control={control}
+            name="gender"
+            rules={{ required: getLang().requiredMsg }}
+            render={({ field: { value, onChange } }) => (
+              <BasicSelectField
+                value={value}
+                onChange={(value) => onChange((value as any).value)}
+                label={getLang().gender}
+                message={errors.gender?.message}
+                containerClassName="mb-5"
+                options={[
+                  {
+                    value: "male",
+                    label: getLang().male,
+                  },
+                  {
+                    value: "female",
+                    label: getLang().female,
+                  },
+                ]}
+              />
+            )}
+          />
+          <DateField
+            label={getLang().birthday}
+            containerClassName="mb-5"
+            message={errors.birthday?.message}
+            {...register("birthday", { required: getLang().requiredMsg })}
+          />
+          <Button type="submit" element="button" className="w-full">
+            {getLang().edit}
+          </Button>
+        </form>
+      </Modal>
     </Fragment>
   );
 }

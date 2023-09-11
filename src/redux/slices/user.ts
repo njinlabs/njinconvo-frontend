@@ -1,11 +1,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { FileObject } from "../../apis/group/meeting/store";
 
 export type UserData = {
   id?: number;
   email: string;
   fullname: string;
   password?: string;
-  avatar?: File | string | null;
+  avatar?: File | FileObject | null;
   gender: string;
   birthday: string;
   role: string;

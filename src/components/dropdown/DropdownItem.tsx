@@ -24,8 +24,8 @@ export default function DropdownItem<T extends typeof Link | "button">({
       {...props}
       className={`rounded flex items-center py-4 justify-start text-left bg-white hover:bg-gray-100 text-gray-600 text-sm ${className}`}
     >
-      <div className={`w-12 flex justify-center text-gray-800`}>
-        <Icon className={`text-lg ${iconClassName}`} />
+      <div className={`w-12 flex items-center justify-center text-gray-800`}>
+        <Icon className={`text-lg mb-0.5 ${iconClassName}`} />
       </div>
       <div className="flex-1">{children}</div>
     </Element>
