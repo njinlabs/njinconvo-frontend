@@ -163,15 +163,21 @@ export default function Layout() {
       </Helmet>
       <div className="w-full min-h-screen bg-gray-200 flex flex-col justify-start space-y-3 px-5 lg:px-8 pb-3 overflow-x-hidden">
         <div className="h-20 flex justify-between items-center relative z-20">
-          <div className="flex-1 flex justify-start items-center transform -translate-x-3 lg:translate-x-0">
-            <button
-              type="button"
-              onClick={() => setMenuShown((value) => !value)}
-              className="mr-1 h-12 px-3 block lg:hidden text-gray-800"
-            >
-              <RiMenu2Fill className={menuShown ? "hidden" : "block"} />
-              <RiCloseFill className={menuShown ? "block" : "hidden"} />
-            </button>
+          <div
+            className={`flex-1 flex justify-start items-center transform ${
+              menus[user?.role! as keyof typeof menus] && "-translate-x-3"
+            } lg:translate-x-0`}
+          >
+            {menus[user?.role! as keyof typeof menus] && (
+              <button
+                type="button"
+                onClick={() => setMenuShown((value) => !value)}
+                className="mr-1 h-12 px-3 block lg:hidden text-gray-800"
+              >
+                <RiMenu2Fill className={menuShown ? "hidden" : "block"} />
+                <RiCloseFill className={menuShown ? "block" : "hidden"} />
+              </button>
+            )}
             <div className="h-16 w-1/2 lg:w-72 bg-white rounded flex justify-center items-center">
               Logo
             </div>

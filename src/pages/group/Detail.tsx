@@ -33,6 +33,7 @@ import { useAppDispatch } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import { warningAlert } from "../../utilities/sweet-alert";
+import getUrl from "../../utilities/get-url";
 
 export default function Detail() {
   const dispatch = useAppDispatch();
@@ -255,8 +256,11 @@ export default function Detail() {
       <Modal control={_infoModal} title={getLang().detail}>
         <div className="flex justify-start items-center space-x-5 mb-6 group-hover:bg-gray-100">
           <div className="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0 rounded-full bg-primary-100 border border-primary-200 flex justify-center items-center overflow-hidden">
-            {group?.avatar ? (
-              <img src={group?.avatar} className="w-full h-full object-cover" />
+            {group?.lead?.avatar?.url ? (
+              <img
+                src={getUrl(group?.lead?.avatar?.url)}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <RiUser6Fill className="text-primary-500 text-xl lg:text-4xl" />
             )}
@@ -365,7 +369,13 @@ export default function Detail() {
                 <List
                   key={`${index}`}
                   title={item.fullname}
-                  photo={item.avatar || <RiUser6Fill />}
+                  photo={
+                    item.avatar?.url ? (
+                      getUrl(item.avatar?.url)
+                    ) : (
+                      <RiUser6Fill />
+                    )
+                  }
                   subtitle={getLang()[item.group_role as keyof typeof getLang]}
                 />
               )

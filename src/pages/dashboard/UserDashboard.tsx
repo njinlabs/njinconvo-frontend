@@ -23,6 +23,7 @@ import getLang from "../../languages";
 import { useAppSelector } from "../../redux/hooks";
 import { useFetcher } from "../../utilities/fetcher";
 import join from "../../apis/group/join";
+import getUrl from "../../utilities/get-url";
 
 export default function UserDashboard() {
   const { control: _composeModal } = useModal({});
@@ -149,7 +150,7 @@ export default function UserDashboard() {
                       name={item.name}
                       lead={{
                         fullname: item.lead.fullname,
-                        avatar: item.lead.avatar,
+                        avatar: getUrl(item.lead.avatar.url),
                       }}
                       participants={item.participants}
                       key={`${index}`}
