@@ -27,6 +27,7 @@ import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import { warningAlert } from "../../utilities/sweet-alert";
 import { FileObject } from "../../apis/group/meeting/store";
+import getUrl from "../../utilities/get-url";
 
 const defaultValues: UserData = {
   fullname: "",
@@ -120,7 +121,7 @@ export default function User() {
               <div className="w-8 h-8 rounded-full bg-primary-100 relative overflow-hidden flex justify-center items-center">
                 {value ? (
                   <img
-                    src={(value as FileObject)?.url as string}
+                    src={getUrl((value as FileObject)?.url as string)}
                     className="w-full h-full object-cover"
                   />
                 ) : (

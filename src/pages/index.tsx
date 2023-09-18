@@ -40,6 +40,7 @@ import { useFetcher } from "../utilities/fetcher";
 import { warningAlert } from "../utilities/sweet-alert";
 import getUrl from "../utilities/get-url";
 import updateProfile from "../apis/user/update-profile";
+import logo from "../assets/logo.svg";
 
 const menus: {
   [key: string]: (Partial<ComponentProps<typeof NavbarList>> & {
@@ -178,8 +179,8 @@ export default function Layout() {
                 <RiCloseFill className={menuShown ? "block" : "hidden"} />
               </button>
             )}
-            <div className="h-16 w-1/2 lg:w-72 bg-white rounded flex justify-center items-center">
-              Logo
+            <div className="h-16 w-1/2 lg:w-72 flex justify-start items-center px-2">
+              <img src={logo} className="h-10 w-auto" />
             </div>
           </div>
           <div

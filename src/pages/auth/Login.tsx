@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { Fragment } from "react";
 import { Helmet } from "react-helmet-async";
+import logo from "../../assets/logo.svg";
 
 export default function Login() {
   const setCookies = useCookies(["token"])[1];
@@ -39,8 +40,8 @@ export default function Login() {
         <title>{getLang().signIn}</title>
       </Helmet>
       <div className="w-full min-h-screen bg-gray-200 flex flex-col items-center justify-start lg:justify-center p-5">
-        <div className="w-2/3 lg:w-[360px] bg-white py-8 rounded mb-5 text-center">
-          Logo
+        <div className="mb-8">
+          <img src={logo} className="w-auto h-16" />
         </div>
         <div className="w-full lg:w-[460px] bg-white rounded border border-gray-400 p-5 lg:p-8">
           <div className="font-bold text-xl text-gray-800 font-nunito-sans">
