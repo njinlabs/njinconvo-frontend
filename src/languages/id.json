@@ -97,5 +97,6 @@
   "oldPassword": "Kata Sandi Lama",
   "newPassword": "Kata Sandi Baru",
   "retypeNewPassword": "Ulangi Kata Sandi Baru",
-  "notSameMsg": "Tidak sama"
+  "notSameMsg": "Tidak sama",
+  "access": "Akses"
 }

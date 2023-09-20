@@ -3,6 +3,7 @@ import getLang from "../../languages";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import UserDashboard from "./UserDashboard";
+import AdminDashboard from "./AdminDashboard";
 
 export default function Dashboard() {
   const { data: user } = useAppSelector((state) => state.user);
@@ -19,5 +20,5 @@ export default function Dashboard() {
 
   if (user?.role === "lead" || user?.role === "participant")
     return <UserDashboard />;
-  return null;
+  return <AdminDashboard />;
 }

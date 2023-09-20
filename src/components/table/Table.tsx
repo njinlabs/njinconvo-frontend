@@ -255,7 +255,7 @@ export default function Table<T>({
           setPage(selected);
           onPageChanged ? onPageChanged(selected + 1) : undefined;
         }}
-        forcePage={page}
+        forcePage={pageTotal > 1 ? page : -1}
         pageRangeDisplayed={3}
         marginPagesDisplayed={1}
         previousLabel="&laquo;"
