@@ -215,7 +215,43 @@ export default function User() {
           },
         ]}
         pageTotal={userFetcher.data?.page_total || 0}
-        onPageChanged={(page) => userFetcher.withoutReset().process({ page })}
+        onPageChanged={(page) =>
+          userFetcher
+            .withoutReset()
+            .process({ ...(userFetcher.savedProps || {}), page })
+        }
+        onSearch={(search) =>
+          userFetcher
+            .remember()
+            .process({ ...(userFetcher.savedProps || {}), search })
+        }
+        sortValues={[
+          {
+            label: getLang().fullname,
+            value: "fullname",
+          },
+          {
+            label: getLang().email,
+            value: "email",
+          },
+          {
+            label: getLang().gender,
+            value: "gender",
+          },
+          {
+            label: getLang().role,
+            value: "role",
+          },
+          {
+            label: getLang().birthday,
+            value: "birthday",
+          },
+        ]}
+        onSort={(value) =>
+          userFetcher
+            .remember()
+            .process({ ...(userFetcher.savedProps || {}), ...value })
+        }
       />
       <Modal
         control={_composeModal}

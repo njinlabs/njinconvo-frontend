@@ -1,12 +1,25 @@
-import { HTMLProps, ReactNode } from "react";
+import { HTMLProps, ReactNode, useEffect, useRef, useState } from "react";
 import {
+  RiArrowDownLine,
   RiArrowUpDownLine,
-  RiFilter2Line,
+  RiArrowUpLine,
   RiSearch2Line,
 } from "react-icons/ri";
+import ReactPaginate from "react-paginate";
 import getLang from "../../languages";
 import Button from "../Button";
-import ReactPaginate from "react-paginate";
+import { DropdownItem } from "../dropdown";
+import DropdownMenu, { DropdownMenuRefObject } from "../dropdown/DropdownMenu";
+
+export type SortType = {
+  label: string;
+  value: string;
+};
+
+export type SortValue = {
+  order: string | undefined;
+  direction: "asc" | "desc" | undefined;
+};
 
 export type TableData<T, K extends keyof T = keyof T> = {
   key: K | null;
@@ -23,6 +36,9 @@ export type TableProps<T> = {
   buttons?: ReactNode;
   pageTotal?: number;
   onPageChanged?: (page: number) => void;
+  onSearch?: (query?: string) => void;
+  sortValues?: SortType[];
+  onSort?: (sort?: SortValue) => void;
 };
 
 export default function Table<T>({
@@ -32,39 +48,142 @@ export default function Table<T>({
   buttons,
   pageTotal = 0,
   onPageChanged,
+  onSearch,
+  onSort,
+  sortValues,
 }: TableProps<T>) {
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(0);
+  const [sort, setSort] = useState<SortValue>({
+    order: undefined,
+    direction: "asc",
+  });
+  const [search, setSearch] = useState("");
+  const _dropdownSort = useRef<DropdownMenuRefObject>();
+
+  useEffect(() => {
+    _dropdownSort.current?.close();
+  }, [sort]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [pageTotal]);
+
   return (
     <div className="flex-1 flex flex-col relative">
-      <div className="border-b border-gray-300 flex justify-start items-center">
-        <div className="border-r border-gray-300 flex-1 lg:flex-0 w-auto lg:w-1/3 relative">
-          <input
-            type="text"
-            className="w-full h-16 px-3 pl-10 lg:pl-12"
-            placeholder={getLang().search + "..."}
-          />
-          <div className="absolute top-0 left-0 h-16 w-10 lg:w-12 flex justify-center items-center pointer-events-none">
-            <RiSearch2Line />
+      <div className="border-b border-gray-300 flex justify-start items-center h-16">
+        {onSearch && (
+          <div className="border-r border-gray-300 flex-1 lg:flex-0 w-auto lg:w-1/3 relative h-full">
+            <input
+              type="text"
+              className="w-full h-full px-3 pl-10 lg:pl-12"
+              placeholder={getLang().search + "..."}
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onSearch(search);
+                }
+              }}
+            />
+            <div className="absolute top-0 left-0 h-full w-10 lg:w-12 flex justify-center items-center pointer-events-none">
+              <RiSearch2Line />
+            </div>
           </div>
-        </div>
+        )}
         <div className="flex items-center justify-end ml-auto px-5 space-x-3">
-          <Button
-            element={"button"}
-            type="button"
-            color="basic"
-            className="flex items-center"
-          >
-            <RiArrowUpDownLine className="text-base lg:text-sm m-0 lg:mr-2" />
-            <span className="hidden lg:block">{getLang().sort}</span>
-          </Button>
-          <Button
-            element={"button"}
-            type="button"
-            color="basic"
-            className="flex items-center"
-          >
-            <RiFilter2Line className="text-base lg:text-sm m-0 lg:mr-2" />
-            <span className="hidden lg:block">{getLang().filter}</span>
-          </Button>
+          {sortValues?.length && (
+            <div
+              className="relative z-20"
+              onBlur={(e) => _dropdownSort.current?.onBlur(e)}
+            >
+              <Button
+                element={"button"}
+                type="button"
+                color="basic"
+                className="flex items-center"
+                onClick={() => _dropdownSort.current?.toggle()}
+              >
+                <RiArrowUpDownLine className="text-base lg:text-sm m-0 lg:mr-2" />
+                <span className="hidden lg:block">{getLang().sort}</span>
+              </Button>
+              <DropdownMenu ref={_dropdownSort}>
+                <DropdownItem
+                  element={"button"}
+                  className={sort.order === undefined ? "!bg-gray-100" : ""}
+                  onClick={() => {
+                    onSort!({
+                      order: undefined,
+                      direction: sort.direction,
+                    });
+                    setSort((value) => ({
+                      order: undefined,
+                      direction: value.direction,
+                    }));
+                  }}
+                >
+                  {getLang().default}
+                </DropdownItem>
+                {sortValues.map((item, index) => (
+                  <DropdownItem
+                    key={`${index}`}
+                    element={"button"}
+                    className={sort.order === item.value ? "!bg-gray-100" : ""}
+                    onClick={() => {
+                      onSort!({
+                        order: item.value,
+                        direction: sort.direction,
+                      });
+                      setSort((value) => ({
+                        order: item.value,
+                        direction: value.direction,
+                      }));
+                    }}
+                  >
+                    {item.label}
+                  </DropdownItem>
+                ))}
+                <DropdownItem
+                  element={"button"}
+                  icon={RiArrowUpLine}
+                  className={
+                    (sort.direction === "asc" ? "!bg-gray-100" : "") +
+                    " border-t border-gray-300"
+                  }
+                  onClick={() => {
+                    onSort!({
+                      order: sort.order,
+                      direction: "asc",
+                    });
+                    setSort((value) => ({
+                      order: value.order,
+                      direction: "asc",
+                    }));
+                  }}
+                >
+                  {getLang().ascend}
+                </DropdownItem>
+                <DropdownItem
+                  element={"button"}
+                  icon={RiArrowDownLine}
+                  className={sort.direction === "desc" ? "!bg-gray-100" : ""}
+                  onClick={() => {
+                    onSort!({
+                      order: sort.order,
+                      direction: "desc",
+                    });
+                    setSort((value) => ({
+                      order: value.order,
+                      direction: "desc",
+                    }));
+                  }}
+                >
+                  {getLang().descend}
+                </DropdownItem>
+              </DropdownMenu>
+            </div>
+          )}
           {buttons}
         </div>
       </div>
@@ -106,7 +225,7 @@ export default function Table<T>({
                       {...(item !== "indexing" && item.props ? item.props : {})}
                     >
                       {item === "indexing"
-                        ? rowIndex + 1
+                        ? page * limit + rowIndex + 1
                         : item.key
                         ? !item.render
                           ? (row[item.key!] as ReactNode)
@@ -129,9 +248,14 @@ export default function Table<T>({
         pageCount={pageTotal > 1 ? pageTotal : 0}
         breakLabel="..."
         nextLabel="&raquo;"
-        onPageChange={({ selected }) =>
-          onPageChanged ? onPageChanged(selected + 1) : undefined
-        }
+        onPageChange={({ selected }) => {
+          if (limit === 0) {
+            setLimit(data.length);
+          }
+          setPage(selected);
+          onPageChanged ? onPageChanged(selected + 1) : undefined;
+        }}
+        forcePage={page}
         pageRangeDisplayed={3}
         marginPagesDisplayed={1}
         previousLabel="&laquo;"

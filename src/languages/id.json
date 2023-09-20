@@ -89,5 +89,8 @@
   "invitationWasCopied": "Undangan Berhasil Disalin",
   "invitationText": "Ayo bergabung dalam grup meeting saya!",
   "editGroup": "Edit Grup",
-  "editProfile": "Edit Profile"
+  "editProfile": "Edit Profile",
+  "ascend": "Naik",
+  "descend": "Turun",
+  "default": "Default"
 }
