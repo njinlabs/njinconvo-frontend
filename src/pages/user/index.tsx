@@ -214,6 +214,8 @@ export default function User() {
             ),
           },
         ]}
+        pageTotal={userFetcher.data?.page_total || 0}
+        onPageChanged={(page) => userFetcher.withoutReset().process({ page })}
       />
       <Modal
         control={_composeModal}

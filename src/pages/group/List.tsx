@@ -75,6 +75,10 @@ export default function List() {
             ),
           },
         ]}
+        pageTotal={indexGroupFetcher.data?.page_total}
+        onPageChanged={(page) =>
+          indexGroupFetcher.withoutReset().process({ page })
+        }
       />
     </Fragment>
   );

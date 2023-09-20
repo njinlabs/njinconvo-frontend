@@ -6,6 +6,7 @@ import {
 } from "react-icons/ri";
 import getLang from "../../languages";
 import Button from "../Button";
+import ReactPaginate from "react-paginate";
 
 export type TableData<T, K extends keyof T = keyof T> = {
   key: K | null;
@@ -20,6 +21,8 @@ export type TableProps<T> = {
   columns: (TableData<T> | "indexing")[];
   loading?: boolean;
   buttons?: ReactNode;
+  pageTotal?: number;
+  onPageChanged?: (page: number) => void;
 };
 
 export default function Table<T>({
@@ -27,6 +30,8 @@ export default function Table<T>({
   columns,
   loading,
   buttons,
+  pageTotal = 0,
+  onPageChanged,
 }: TableProps<T>) {
   return (
     <div className="flex-1 flex flex-col relative">
@@ -115,6 +120,23 @@ export default function Table<T>({
           </table>
         </div>
       </div>
+      <ReactPaginate
+        className="flex flex-wrap justify-center lg:justify-end items-center space-x-2 py-2 px-5 bg-white"
+        previousLinkClassName="inline-block w-10 h-10 flex justify-center items-center bg-primary-100 text-primary-800 border border-primary-300 rounded text-sm font-normal my-1"
+        nextLinkClassName="inline-block w-10 h-10 flex justify-center items-center bg-primary-100 text-primary-800 border border-primary-300 rounded text-sm font-normal my-1"
+        pageLinkClassName="inline-block w-10 h-10 flex justify-center items-center bg-primary-100 text-primary-800 border border-primary-300 rounded text-sm font-normal my-1"
+        activeLinkClassName="!bg-gray-100 !border-gray-300 !text-gray-600"
+        pageCount={pageTotal > 1 ? pageTotal : 0}
+        breakLabel="..."
+        nextLabel="&raquo;"
+        onPageChange={({ selected }) =>
+          onPageChanged ? onPageChanged(selected + 1) : undefined
+        }
+        pageRangeDisplayed={3}
+        marginPagesDisplayed={1}
+        previousLabel="&laquo;"
+        renderOnZeroPageCount={null}
+      />
 
       {loading && (
         <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10 flex justify-center items-center">
