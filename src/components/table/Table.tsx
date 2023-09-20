@@ -95,7 +95,7 @@ export default function Table<T>({
         <div className="flex items-center justify-end ml-auto px-5 space-x-3">
           {sortValues?.length && (
             <div
-              className="relative z-20"
+              className="relative"
               onBlur={(e) => _dropdownSort.current?.onBlur(e)}
             >
               <Button
@@ -187,7 +187,7 @@ export default function Table<T>({
           {buttons}
         </div>
       </div>
-      <div className="relative flex-1">
+      <div className="relative flex-1 -z-0">
         <div className="absolute top-0 left-0 w-full h-full overflow-auto">
           <table
             className="min-w-full border-collapse"

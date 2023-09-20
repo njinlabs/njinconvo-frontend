@@ -39,20 +39,20 @@ export default function List() {
           "indexing",
           {
             key: "name",
-            label: "Nama Grup",
+            label: getLang().name,
           },
           {
             key: "code",
-            label: "Kode",
+            label: getLang().groupCode,
           },
           {
             key: "lead",
-            label: "Pimpinan",
+            label: getLang().lead,
             render: (value, _) => value?.fullname,
           },
           {
             key: "participants",
-            label: "Anggota",
+            label: getLang().participants,
             render: (value, _) => `${value} Peserta`,
           },
           {
@@ -78,6 +78,33 @@ export default function List() {
         pageTotal={indexGroupFetcher.data?.page_total}
         onPageChanged={(page) =>
           indexGroupFetcher.withoutReset().process({ page })
+        }
+        onSearch={(search) =>
+          indexGroupFetcher.remember().process({
+            ...(indexGroupFetcher.savedProps || {}),
+            search,
+          })
+        }
+        sortValues={[
+          {
+            label: getLang().name,
+            value: "name",
+          },
+          {
+            label: getLang().groupCode,
+            value: "code",
+          },
+          {
+            label: getLang().participants,
+            value: "users_count",
+          },
+        ]}
+        onSort={(sort) =>
+          indexGroupFetcher.remember().process({
+            ...(indexGroupFetcher.savedProps || {}),
+            order: sort?.order,
+            direction: sort?.direction,
+          })
         }
       />
     </Fragment>
