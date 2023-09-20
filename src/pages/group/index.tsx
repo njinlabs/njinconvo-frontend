@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import show from "../../apis/group/show";
-import { useAppDispatch } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setWeb } from "../../redux/slices/web";
 import { useFetcher } from "../../utilities/fetcher";
 import NotFound from "../../components/NotFound";
@@ -9,6 +9,7 @@ import NotFound from "../../components/NotFound";
 export default function Group() {
   const dispatch = useAppDispatch();
   const { groupId } = useParams();
+  const { data: user } = useAppSelector((value) => value.user);
 
   const groupShowFetcher = useFetcher({
     api: show,
@@ -17,7 +18,7 @@ export default function Group() {
   useEffect(() => {
     dispatch(
       setWeb({
-        active: "dashboard",
+        active: user?.role === "administrator" ? "group" : "dashboard",
       })
     );
   }, []);
