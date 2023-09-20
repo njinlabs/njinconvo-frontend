@@ -39,7 +39,7 @@ export default function store({
 }: MeetingParams) {
   const formData = new FormData();
   for (const key in data) {
-    if (data[key as keyof typeof data]) {
+    if (data[key as keyof typeof data] !== undefined) {
       formData.append(key, `${data[key as keyof typeof data]!}`);
     }
   }
