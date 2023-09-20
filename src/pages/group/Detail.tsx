@@ -328,7 +328,7 @@ export default function Detail() {
               <RiDeleteBin2Line />
               <span>{getLang().delete}</span>
             </Button>
-          ) : (
+          ) : group?.has_joined?.group_role === "participant" ? (
             <Button
               type="button"
               element={"button"}
@@ -355,7 +355,7 @@ export default function Detail() {
               <RiLogoutCircleLine />
               <span>{getLang().leave}</span>
             </Button>
-          )}
+          ) : null}
         </div>
         <div className="font-bold text-gray-700 font-montserrat mb-5">
           {getLang().participants}

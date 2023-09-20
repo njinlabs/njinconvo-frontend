@@ -92,5 +92,10 @@
   "editProfile": "Edit Profile",
   "ascend": "Naik",
   "descend": "Turun",
-  "default": "Default"
+  "default": "Default",
+  "changePassword": "Ganti Kata Sandi",
+  "oldPassword": "Kata Sandi Lama",
+  "newPassword": "Kata Sandi Baru",
+  "retypeNewPassword": "Ulangi Kata Sandi Baru",
+  "notSameMsg": "Tidak sama"
 }

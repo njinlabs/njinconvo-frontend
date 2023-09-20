@@ -328,10 +328,6 @@ export default function User() {
                 containerClassName="mb-5"
                 options={[
                   {
-                    value: "administrator",
-                    label: getLang().administrator,
-                  },
-                  {
                     value: "lead",
                     label: getLang().lead,
                   },

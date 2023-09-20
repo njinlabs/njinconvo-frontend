@@ -14,6 +14,7 @@ import { CgChevronDown } from "react-icons/cg";
 import {
   RiCameraFill,
   RiCloseFill,
+  RiLockPasswordLine,
   RiLogoutCircleLine,
   RiMenu2Fill,
   RiUser6Fill,
@@ -41,6 +42,7 @@ import { warningAlert } from "../utilities/sweet-alert";
 import getUrl from "../utilities/get-url";
 import updateProfile from "../apis/user/update-profile";
 import logo from "../assets/logo.svg";
+import changePassword from "../apis/user/change-password";
 
 const menus: {
   [key: string]: (Partial<ComponentProps<typeof NavbarList>> & {
@@ -59,10 +61,6 @@ const menus: {
     {
       to: "/user",
       name: "user",
-    },
-    {
-      to: "/setting",
-      name: "setting",
     },
   ],
 };
@@ -86,6 +84,7 @@ export default function Layout() {
   const { pathname } = useLocation();
   const [menuShown, setMenuShown] = useState(false);
   const { control: _editProfile } = useModal({});
+  const { control: _changePassword } = useModal({});
   const _avatar = useRef<HTMLInputElement>();
 
   const {
@@ -98,9 +97,38 @@ export default function Layout() {
     defaultValues: defaultProfile,
   });
 
+  const {
+    register: changePasswordRegister,
+    handleSubmit: changePasswordHandleSubmit,
+    formState: { errors: changePasswordErrors },
+    reset: changePasswordReset,
+    watch,
+  } = useForm({
+    defaultValues: {
+      oldPassword: "",
+      newPassword: "",
+      newPassword2: "",
+    },
+  });
+
   const logoutFetcher = useFetcher({
     api: signOut,
     onSuccess: () => {
+      dispatch(clearUser());
+      removeCookies("token", {
+        path: "/",
+      });
+    },
+  });
+
+  const changePasswordFetcher = useFetcher({
+    api: changePassword,
+    onSuccess: () => {
+      changePasswordReset({
+        oldPassword: "",
+        newPassword: "",
+        newPassword2: "",
+      });
       dispatch(clearUser());
       removeCookies("token", {
         path: "/",
@@ -247,6 +275,13 @@ export default function Layout() {
                   {getLang().editProfile}
                 </DropdownItem>
                 <DropdownItem
+                  element={"button"}
+                  icon={RiLockPasswordLine}
+                  onClick={() => _changePassword.open()}
+                >
+                  {getLang().changePassword}
+                </DropdownItem>
+                <DropdownItem
                   onClick={() => {
                     warningAlert({
                       title: getLang().sure,
@@ -277,6 +312,63 @@ export default function Layout() {
           <Outlet />
         </div>
       </div>
+      <Modal control={_changePassword} title={getLang().changePassword}>
+        <form
+          onSubmit={changePasswordHandleSubmit(
+            ({ oldPassword, newPassword }) => {
+              toast.promise(
+                changePasswordFetcher.process({
+                  oldPassword,
+                  newPassword,
+                }),
+                {
+                  pending: getLang().waitAMinute,
+                  success: getLang().succeed,
+                  error: getLang().failed,
+                }
+              );
+            }
+          )}
+        >
+          <TextField
+            type="password"
+            label={getLang().oldPassword}
+            containerClassName="mb-5"
+            message={changePasswordErrors.oldPassword?.message}
+            {...changePasswordRegister("oldPassword", {
+              required: getLang().requiredMsg,
+            })}
+          />
+          <TextField
+            type="password"
+            label={getLang().newPassword}
+            containerClassName="mb-5"
+            message={changePasswordErrors.newPassword?.message}
+            {...changePasswordRegister("newPassword", {
+              required: getLang().requiredMsg,
+            })}
+          />
+          <TextField
+            type="password"
+            label={getLang().retypeNewPassword}
+            containerClassName="mb-5"
+            message={changePasswordErrors.newPassword2?.message}
+            {...changePasswordRegister("newPassword2", {
+              required: getLang().requiredMsg,
+              validate: (value) =>
+                watch("newPassword") === value || getLang().notSameMsg,
+            })}
+          />
+          <Button
+            type="submit"
+            element="button"
+            className="w-full"
+            disabled={changePasswordFetcher.isLoading}
+          >
+            {getLang().save}
+          </Button>
+        </form>
+      </Modal>
       <Modal control={_editProfile} title={getLang().editProfile}>
         <form
           onSubmit={handleSubmit((data) => {
