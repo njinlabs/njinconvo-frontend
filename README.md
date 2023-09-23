@@ -1,5 +1,5 @@
-![NjinConvo Dashboard](https://labs.njintech.com/convo-ss1.png "NjinConvo Dashboard").
-![NjinConvo Meeting Page](https://labs.njintech.com/convo-ss2.png "NjinConvo Meeting Page").
+![NjinConvo Dashboard](https://labs.njintech.com/convo-ss1.png "NjinConvo Dashboard")
+![NjinConvo Meeting Page](https://labs.njintech.com/convo-ss2.png "NjinConvo Meeting Page")
 
 # NjinConvo - Meeting and Video Conference Management
 
