@@ -150,7 +150,9 @@ export default function UserDashboard() {
                       name={item.name}
                       lead={{
                         fullname: item.lead.fullname,
-                        avatar: getUrl(item.lead.avatar.url),
+                        avatar: item.lead.avatar
+                          ? getUrl(item.lead.avatar.url)
+                          : null,
                       }}
                       participants={item.participants}
                       key={`${index}`}
