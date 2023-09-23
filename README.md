@@ -1,27 +1,34 @@
-# React + TypeScript + Vite
+![NjinConvo Dashboard](https://labs.njintech.com/convo-ss1.png "NjinConvo Dashboard").
+![NjinConvo Meeting Page](https://labs.njintech.com/convo-ss2.png "NjinConvo Meeting Page").
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# NjinConvo - Meeting and Video Conference Management
 
-Currently, two official plugins are available:
+NjinConvo is an open-source application designed to simplify and enhance the management of meetings and video conferences within organizations. It provides a comprehensive set of features for efficient meeting scheduling, collaboration, attendance tracking, group management, and scheduling customization.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **Efficient Meeting Management**: Easily schedule, create, and manage meetings.
+- **Enhanced Collaboration**: Share files, links, and notes during meetings for seamless collaboration.
+- **Accurate Attendance Tracking**: Keep track of participant attendance to ensure meetings run smoothly.
+- **Flexible Group Management**: Manage various meeting groups with customizable settings.
+- **Open Source**: NjinConvo is an open-source project, giving you control over its source code and development.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Demo
 
-- Configure the top-level `parserOptions` property like this:
+Explore NjinConvo's features in our [Demo](https://convo.njintech.com).
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
+## Documentation
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+For detailed installation and usage instructions, please refer to our [Documentation](https://labs.njintech.com/docs/convo/intro).
+
+## Support Us
+
+If you find NjinConvo valuable and would like to support its development, consider [making a donation](https://opencollective.com/njinlabs) to NjinLabs via Open Collective.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+For more information and support, please visit our [website](https://labs.njintech.com).
