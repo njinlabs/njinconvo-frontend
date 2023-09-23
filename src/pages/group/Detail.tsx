@@ -101,8 +101,8 @@ export default function Detail() {
     const textToCopy = new ClipboardItem({
       "text/plain": new Blob(
         [
-          `${getLang().invitationText} \n\n ${
-            import.meta.env.VITE_APP_URL
+          `${getLang().invitationText} \n\n https://${
+            window.location.hostname
           }/?join=${code}`,
         ],
         {
