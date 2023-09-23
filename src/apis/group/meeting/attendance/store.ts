@@ -6,7 +6,7 @@ export type AttendaceDetailType = {
 };
 
 export type AttendanceParams = {
-  allow_self_attendance: boolean;
+  allow_self_attendance: boolean | undefined;
   self_attendance_due?: string;
   show_it_to_participants: boolean;
   details: AttendaceDetailType[];

@@ -179,22 +179,31 @@ export default function Attendance() {
                     onClick={(
                       e: BaseSyntheticEvent<object, any, any> | undefined
                     ) =>
-                      handleSubmit(({ self_attendance_due, ...data }) =>
-                        toast.promise(
-                          saveFetcher.process({
-                            groupId: group.id,
-                            id: meeting.id,
-                            self_attendance_due: moment(
-                              self_attendance_due
-                            ).format("YYYY-MM-DD HH:mm:ss"),
-                            ...data,
-                          }),
-                          {
-                            pending: getLang().waitAMinute,
-                            error: getLang().failed,
-                            success: getLang().succeed,
-                          }
-                        )
+                      handleSubmit(
+                        ({
+                          self_attendance_due,
+                          allow_self_attendance,
+                          ...data
+                        }) =>
+                          toast.promise(
+                            saveFetcher.process({
+                              groupId: group.id,
+                              id: meeting.id,
+                              self_attendance_due: allow_self_attendance
+                                ? moment(self_attendance_due).format(
+                                    "YYYY-MM-DD HH:mm:ss"
+                                  )
+                                : undefined,
+                              allow_self_attendance:
+                                allow_self_attendance || undefined,
+                              ...data,
+                            }),
+                            {
+                              pending: getLang().waitAMinute,
+                              error: getLang().failed,
+                              success: getLang().succeed,
+                            }
+                          )
                       )(e)
                     }
                     disabled={saveFetcher.isLoading}
